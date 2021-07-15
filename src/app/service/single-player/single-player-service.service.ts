@@ -5,24 +5,26 @@ import { Injectable } from '@angular/core';
 })
 export class SinglePlayerServiceService {
 
-  constructor() { }
+  // const width = 10;
+  // userSquares:any = []
+  // computerSquares:any = []
 
 
-  function generate(ship) {
-    let randomDirection = Math.floor(Math.random() * ship.directions.length)
-    let current = ship.directions[randomDirection]
-    if (randomDirection === 0) direction = 1
-    if (randomDirection === 1) direction = 10
-    let randomStart = Math.abs(Math.floor(Math.random() * computerSquares.length - (ship.directions[0].length * direction)))
 
-    const isTaken = current.some(index => computerSquares[randomStart + index].classList.contains('taken'))
-    const isAtRightEdge = current.some(index => (randomStart + index) % width === width - 1)
-    const isAtLeftEdge = current.some(index => (randomStart + index) % width === 0)
+  // constructor() { }
+  // //Calling the functions
+  // createBoard(userGrid, userSquares: any)
+  // createBoard(computerGrid,computerSquares: any)
 
-    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach(index => computerSquares[randomStart + index].classList.add('taken', ship.name))
 
-    else generate(ship)
-  }
+  // //Making the functions for the game
+  // createBoard(grid, squares) {
+  //   for (let i = 0; i < this.width* this.width; i++) {
+  //     const square = document.createElement('div')
+  //     square.dataset.id = i
+  //     grid.appendChild(square)
+  //     squares.push(square)
+  //   }
 
   
 
