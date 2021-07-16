@@ -1,3 +1,4 @@
+import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 
 @Component({
@@ -13,6 +14,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit{
   width = 10;
   userSquares:any = []
   computerSquares:any = []
+ 
 
 
   // userGrid = document.querySelector('.grid-user')
@@ -21,32 +23,36 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit{
   
   ngAfterViewInit() {
 
-   // console.log(this.userGrid.nativeElement.querySelector('.grid-user'));
-    //console.log(this.renderer.selectRootElement(this.userGrid));
+   console.log(this.userGrid.nativeElement.querySelector('.grid-user'),'check1');
+    console.log(this.renderer.selectRootElement(this.userGrid), 'checkTwo');
 
-    this.createBoard(this.renderer.selectRootElement(this.userGrid), this.userSquares);
-    this.createBoard(this.renderer.selectRootElement(this.computerGrid), this.computerSquares);
-    
+    this.createBoard(this.userGrid, this.userSquares);
+    this.createBoard(this.computerGrid, this.computerSquares);
   }
 
-  constructor(private renderer:Renderer2) { }
+  constructor(private renderer:Renderer2, private he:ElementRef) { }
 
   ngOnInit(): void {
-  
+   
+
+
+    console.log(this.he.nativeElement.querySelector('.grid-user'), 'CheckThree');
+    console.log(this.renderer.selectRootElement('.grid-user'), 'CheckFour');
   }
 
   //Calling the functions
 
   //Making the functions for the game
   createBoard(grid: any, squares: any) {
-    console.log(grid);
-    console.log(squares);
+    console.log(grid, 'CheckFive');
+    console.log(squares, 'checkSix');
     for (let i = 0; i < (this.width* this.width); i++) {
-      const square = this.renderer.createElement('div');
+      let square = this.renderer.createElement('div');
       square.dataset.id = i;
       // grid.appendChild(square)
-      this.renderer.appendChild(grid, square);
-      squares.push(square)
+      this.renderer.appendChild(grid.nativeElement, square);
+      squares.push(square);
+      //this.he.nativeElement.push(square)
     }
   }
 
