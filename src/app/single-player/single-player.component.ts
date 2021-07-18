@@ -11,11 +11,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   @ViewChild("userGrid") userGrid!: ElementRef;
   @ViewChild("computerGrid") computerGrid!: ElementRef;
-  @ViewChild('cdkBoard',{read:ElementRef,static:false}) boardElement!: ElementRef;
+  //@ViewChild("destroyerContainer") destroyerContainer!: ElementRef; 
 
   width = 10;
   userSquares: any = []
   computerSquares: any = []
+  isVertical: boolean = false;
   shipArray = [
     {name: 'destroyer',directions: [[0, 1],[0, this.width]]},
     {name: 'submarine',directions: [[0, 1, 2],[0, this.width, this.width * 2]]},
@@ -26,10 +27,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit() {
-
-    console.log(this.userGrid.nativeElement.querySelector('.grid-user'), 'check1');
-    console.log(this.renderer.selectRootElement(this.userGrid), 'checkTwo');
-
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
   }
@@ -37,11 +34,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2, private he: ElementRef) { }
 
   ngOnInit(): void {
-
-
-
-    console.log(this.he.nativeElement.querySelector('.grid-user'), 'CheckThree');
-    console.log(this.renderer.selectRootElement('.grid-user'), 'CheckFour');
+    
   }
 
   //Calling the functions
@@ -58,6 +51,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       squares.push(square);
       //this.he.nativeElement.push(square)
     }
+  }
+
+  rotateShips(){
+   this.isVertical = !this.isVertical;
   }
 
 
