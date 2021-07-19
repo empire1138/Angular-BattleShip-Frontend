@@ -12,6 +12,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   @ViewChild("userGrid") userGrid!: ElementRef;
   @ViewChild("computerGrid") computerGrid!: ElementRef;
+  @ViewChild("displayGrid") displayGrid!: ElementRef;
   //@ViewChild("destroyerContainer") destroyerContainer!: ElementRef; 
 
   width = 10;
@@ -21,6 +22,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   selectedShipNameWithIndex: any;
   draggedShip: any;
   draggedShipLength: any;
+  isGameOver:boolean = false
+  currentPlayer: string = 'user'
+  playerNum: number = 0
+  ready: boolean = false
+  enemyReady: boolean = false
+  allShipsPlaced: boolean = false
+  shotFired: number = -1
 
   shipArray = [
     { name: 'destroyer', directions: [[0, 1], [0, this.width]] },
@@ -108,17 +116,40 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
     shipLastId = shipLastId - selectedShipIndex
-    console.log(shipLastId,  'SecondShipLastID'); 
+    console.log(shipLastId, 'SecondShipLastID');
+
+
+    if (this.isVertical && !newNotAllowedHorizontal.includes(shipLastId)) {
+      for (let i = 0; i < this.draggedShipLength; i++) {
+        let directionClass
+        if (i === 0) directionClass = 'start'
+        if (i === this.draggedShipLength - 1) directionClass = 'end'
+        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
+      }
+      //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
+      //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
+    } else if (!this.isVertical && !newNotAllowedVertical.includes(shipLastId)) {
+      for (let i = 0; i < this.draggedShipLength; i++) {
+        let directionClass
+        if (i === 0) directionClass = 'start'
+        if (i === this.draggedShipLength - 1) directionClass = 'end'
+        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + this.width * i].classList.add('taken', 'vertical', directionClass, shipClass)
+      }
+    } else return
+
+    this.displayGrid.nativeElement.removeChild(this.draggedShip)
+    if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
   }
 
-  onDragEnter(event: any) {
-    event.preventDefault();
-    console.log('drag enter', event);
 
-  }
-  shipIDMouseDown(event: any) {
-    this.selectedShipNameWithIndex = event.target.id;
-  }
+onDragEnter(event: any) {
+  event.preventDefault();
+  console.log('drag enter', event);
+
+}
+shipIDMouseDown(event: any) {
+  this.selectedShipNameWithIndex = event.target.id;
+}
 
 
 }
