@@ -3,10 +3,10 @@
     <div
       #userGrid
       (dragstart)="onDragStart($event)"
-      (dragover)="onDrag($event)"
+      (dragover)="onDragOver($event)"
       (dragenter)="onDragEnter($event)"
       (dragleave)="onDragLeave($event)"
-      (drop)="onDragEnd($event)"
+      (drop)="onDrop($event)"
       (dragend)="onDragEnd($event)"
       class="battleship-grid grid-user"
     ></div>
@@ -26,7 +26,13 @@
   <h3 id="info" class="info-text"></h3>
 </div>
 
-<div class="container" (dragstart)="onDragStart($event)" (mousedown)="shipIDMouseDown($event)">
+<div
+  class="container"
+  (dragstart)="onDragStart($event)"
+  (dragend)="onDragEnd($event)"
+  (drop)="onDrop($event)"
+  (mousedown)="shipIDMouseDown($event)"
+>
   <div class="grid-display">
     <div
       class="ship"

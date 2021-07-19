@@ -2,6 +2,7 @@ import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
 
+
 @Component({
   selector: 'app-single-player',
   templateUrl: './single-player.component.html',
@@ -17,6 +18,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   userSquares: any = []
   computerSquares: any = []
   isVertical: boolean = false;
+  selectedShipNameWithIndex: any;
+  draggedShip: any;
+  draggedShipLength: any;
+
   shipArray = [
     { name: 'destroyer', directions: [[0, 1], [0, this.width]] },
     { name: 'submarine', directions: [[0, 1, 2], [0, this.width, this.width * 2]] },
@@ -62,38 +67,57 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   //drag Events for the ships 
-  onDragStart(event: DragEvent) {
-    console.log(`starting`, event);
-    console.log(event.target)
+  onDragStart(event: any) {
+    this.draggedShip = event.target
+    this.draggedShipLength = this.draggedShip.childNodes.length;
+    console.log(this.draggedShip, 'draggedShip')
+    console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
     console.log('dragging', event);
   }
 
-  onDragOver(event: DragEvent) {
+  onDragOver(event: any) {
+    event.preventDefault();
     console.log('drag over', event);
     console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
     console.log('drag end', event);
-    
+
   }
   onDragLeave(event: DragEvent) {
     console.log('drag leave', event);
   }
 
-  onDrop(event: DragEvent) {
-    console.log('dropped', event);
+  onDrop(event: any) {
+    console.log(event.target.dataset.id, 'dataset.id')
+    let shipNameWithLastID = this.draggedShip.lastChild.id;
+    let shipClass = shipNameWithLastID.slice(0, -2);
+    let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
+    let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
+    console.log(shipLastId, 'shipLastId');
+
+    const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
+    const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
+
+    let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)
+    let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
+
+    let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
+    shipLastId = shipLastId - selectedShipIndex
+    console.log(shipLastId,  'SecondShipLastID'); 
   }
 
-  onDragEnter(event: DragEvent) {
+  onDragEnter(event: any) {
+    event.preventDefault();
     console.log('drag enter', event);
 
   }
-  shipIDMouseDown(event:any){
-    console.log(event.target.id)
+  shipIDMouseDown(event: any) {
+    this.selectedShipNameWithIndex = event.target.id;
   }
 
 

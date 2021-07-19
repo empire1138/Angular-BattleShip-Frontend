@@ -7,7 +7,7 @@ export class SinglePlayerServiceService {
 
   // const width = 10;
   // userSquares:any = []
-  // computerSquares:any = []
+  // computerSquares:anly = []
 
 
 
