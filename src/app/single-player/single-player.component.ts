@@ -1,6 +1,6 @@
 import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop"; 
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
 
 @Component({
   selector: 'app-single-player',
@@ -18,11 +18,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   computerSquares: any = []
   isVertical: boolean = false;
   shipArray = [
-    {name: 'destroyer',directions: [[0, 1],[0, this.width]]},
-    {name: 'submarine',directions: [[0, 1, 2],[0, this.width, this.width * 2]]},
-    {name: 'cruiser',directions: [[0, 1, 2],[0, this.width, this.width * 2]]},
-    {name: 'battleship',directions: [[0, 1, 2, 3],[0, this.width, this.width * 2, this.width * 3]]},
-    {name: 'carrier',directions: [[0, 1, 2, 3, 4],[0, this.width, this.width * 2, this.width * 3, this.width * 4]]},
+    { name: 'destroyer', directions: [[0, 1], [0, this.width]] },
+    { name: 'submarine', directions: [[0, 1, 2], [0, this.width, this.width * 2]] },
+    { name: 'cruiser', directions: [[0, 1, 2], [0, this.width, this.width * 2]] },
+    { name: 'battleship', directions: [[0, 1, 2, 3], [0, this.width, this.width * 2, this.width * 3]] },
+    { name: 'carrier', directions: [[0, 1, 2, 3, 4], [0, this.width, this.width * 2, this.width * 3, this.width * 4]] },
   ]
 
 
@@ -34,7 +34,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2, private he: ElementRef) { }
 
   ngOnInit(): void {
-    
+
   }
 
   //Calling the functions
@@ -53,8 +53,48 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  rotateShips(){
-   this.isVertical = !this.isVertical;
+  rotateShips() {
+    this.isVertical = !this.isVertical;
+  }
+
+  startGame() {
+
+  }
+
+  //drag Events for the ships 
+  onDragStart(event: DragEvent) {
+    console.log(`starting`, event);
+    console.log(event.target)
+  }
+
+  onDrag(event: DragEvent) {
+    console.log('dragging', event);
+  }
+
+  onDragOver(event: DragEvent) {
+    console.log('drag over', event);
+    console.log(event.target)
+  }
+
+  onDragEnd(event: DragEvent) {
+    console.log('drag end', event);
+    
+  }
+  onDragLeave(event: DragEvent) {
+    console.log('drag leave', event);
+  }
+
+  onDrop(event: DragEvent) {
+    console.log('dropped', event);
+  }
+
+  onDragEnter(event: DragEvent) {
+    console.log('drag enter', event);
+
+  }
+
+  shipIDMouseDown(event:any){
+    console.log(event.target.id)
   }
 
 
