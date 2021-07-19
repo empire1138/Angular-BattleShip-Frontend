@@ -92,7 +92,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log('drag enter', event);
 
   }
-
   shipIDMouseDown(event:any){
     console.log(event.target.id)
   }
