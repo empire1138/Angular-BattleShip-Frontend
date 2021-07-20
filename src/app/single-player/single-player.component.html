@@ -17,7 +17,7 @@
 
 <div class="container hidden-info">
   <div class="setup-buttons" id="setup-buttons">
-    <button id="start" class="btn" (click)="startGame()">Start Game</button>
+    <button *ngIf="!isGameStarted" id="start" class="btn" [class.disabled-color]="!allShipsPlaced" [disabled]="!allShipsPlaced" (click)="startGame()">Start Game</button>
     <button id="rotate" class="btn" (click)="rotateShips()">
       Rotate Your Ships
     </button>

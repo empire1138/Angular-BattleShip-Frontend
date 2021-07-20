@@ -19,6 +19,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   userSquares: any = []
   computerSquares: any = []
   isHorizontal: boolean = true;
+  isGameStarted: boolean = false;
   selectedShipNameWithIndex: any;
   draggedShip: any;
   draggedShipLength: any;
@@ -92,20 +93,21 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.generateComputerShips(this.shipArray[4]);
 
     this.playGameSinglePlayer();
+    this.isGameStarted = !this.isGameStarted;
 
   }
   playGameSinglePlayer() {
     if (this.isGameOver) return
     if (this.currentPlayer === 'user') {
       // turnDisplay.innerHTML = 'Your Go'
-      this.computerSquares.forEach((square:any) => square.addEventListener('click', () => {
+      this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
         this.shotFired = square.dataset.id
         this.revealSquare(square.classList)
       }))
     }
     if (this.currentPlayer === 'enemy') {
       // turnDisplay.innerHTML = 'Computers Go'
-      setTimeout(()=>{
+      setTimeout(() => {
         this.enemyGoTurn()
       }, 1000);
     }
@@ -127,7 +129,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     }
     this.checkForWins()
     this.currentPlayer = 'enemy'
-    if(this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
+    if (this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
   }
   enemyGoTurn(square?: any) {
     if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
@@ -147,7 +149,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
   checkForWins() {
     let enemy = 'computer'
-    if(this.gameMode === 'multiPlayer') enemy = 'enemy'
+    if (this.gameMode === 'multiPlayer') enemy = 'enemy'
     if (this.destroyerCount === 2) {
       //infoDisplay.innerHTML = `You sunk the ${enemy}'s destroyer`
       this.destroyerCount = 10
@@ -194,7 +196,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
-     // infoDisplay.innerHTML = `${enemy.toUpperCase()} WINS`
+      // infoDisplay.innerHTML = `${enemy.toUpperCase()} WINS`
       this.gameOver()
     }
   }
@@ -227,7 +229,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.computerSquares[randomStart + index].classList.add('taken', ship.name))
 
     else this.generateComputerShips(ship)
+
   }
+
 
   //drag Events for the ships 
   onDragStart(event: any) {
