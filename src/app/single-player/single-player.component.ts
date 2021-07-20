@@ -8,6 +8,11 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/dr
   templateUrl: './single-player.component.html',
   styleUrls: ['./single-player.component.css']
 })
+
+
+  
+
+ 
 export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   @ViewChild("userGrid") userGrid!: ElementRef;
