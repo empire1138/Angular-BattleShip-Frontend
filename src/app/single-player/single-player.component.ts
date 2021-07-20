@@ -18,7 +18,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   width = 10;
   userSquares: any = []
   computerSquares: any = []
-  isVertical: boolean = false;
+  isHorizontal: boolean = true;
   selectedShipNameWithIndex: any;
   draggedShip: any;
   draggedShipLength: any;
@@ -67,7 +67,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   rotateShips() {
-    this.isVertical = !this.isVertical;
+    this.isHorizontal = !this.isHorizontal;
   }
 
   startGame() {
@@ -115,11 +115,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
+    console.log(shipLastId, 'SecondShipLastID')
+    console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
-    console.log(shipLastId, 'SecondShipLastID');
+    console.log(shipLastId, 'ThirdShipLastID');
 
 
-    if (this.isVertical && !newNotAllowedHorizontal.includes(shipLastId)) {
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -128,12 +130,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isVertical && !newNotAllowedVertical.includes(shipLastId)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + this.width * i].classList.add('taken', 'vertical', directionClass, shipClass)
+        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
       }
     } else return
 
