@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { SinglePlayerComponent } from 'src/app/single-player/single-player.component';
 
 import { SinglePlayerServiceService } from './single-player-service.service';
 
