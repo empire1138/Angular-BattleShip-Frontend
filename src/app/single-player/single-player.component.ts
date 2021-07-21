@@ -31,7 +31,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   allShipsPlaced: boolean = false
   shotFired: number = -1
   gameMode: string = 'singlePlayer'
-  turnMessageDisplay: any;
+  infoMessageDisplay: string = '';
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -100,14 +100,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   playGameSinglePlayer() {
     if (this.isGameOver) return
     if (this.currentPlayer === 'user') {
-      // turnDisplay.innerHTML = 'Your Go'
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
         this.shotFired = square.dataset.id
         this.revealSquare(square.classList)
       }))
     }
     if (this.currentPlayer === 'enemy') {
-      // turnDisplay.innerHTML = 'Computers Go'
       setTimeout(() => {
         this.enemyGoTurn()
       }, 1000);
@@ -145,59 +143,58 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       this.checkForWins()
     } else if (this.gameMode === 'singlePlayer') this.enemyGoTurn()
     this.currentPlayer = 'user'
-    // turnDisplay.innerHTML = 'Your Go'
 
   }
   checkForWins() {
     let enemy = 'computer'
     if (this.gameMode === 'multiPlayer') enemy = 'enemy'
     if (this.destroyerCount === 2) {
-      //infoDisplay.innerHTML = `You sunk the ${enemy}'s destroyer`
+      this.infoMessageDisplay = `You sunk the ${enemy}'s destroyer`
       this.destroyerCount = 10
     }
     if (this.submarineCount === 3) {
-      //infoDisplay.innerHTML = `You sunk the ${enemy}'s submarine`
+      this.infoMessageDisplay = `You sunk the ${enemy}'s submarine`
       this.submarineCount = 10
     }
     if (this.cruiserCount === 3) {
-      //infoDisplay.innerHTML = `You sunk the ${enemy}'s cruiser`
+      this.infoMessageDisplay = `You sunk the ${enemy}'s cruiser`
       this.cruiserCount = 10
     }
     if (this.battleshipCount === 4) {
-      //infoDisplay.innerHTML = `You sunk the ${enemy}'s battleship`
+      this.infoMessageDisplay = `You sunk the ${enemy}'s battleship`
       this.battleshipCount = 10
     }
     if (this.carrierCount === 5) {
-      //infoDisplay.innerHTML = `You sunk the ${enemy}'s carrier`
+      this.infoMessageDisplay = `You sunk the ${enemy}'s carrier`
       this.carrierCount = 10
     }
     if (this.cpuDestroyerCount === 2) {
-      //infoDisplay.innerHTML = `${enemy} sunk your destroyer`
+      this.infoMessageDisplay = `${enemy} sunk your destroyer`
       this.cpuDestroyerCount = 10
     }
     if (this.cpuSubmarineCount === 3) {
-      //infoDisplay.innerHTML = `${enemy} sunk your submarine`
+      this.infoMessageDisplay = `${enemy} sunk your submarine`
       this.cpuSubmarineCount = 10
     }
     if (this.cpuCruiserCount === 3) {
-      //infoDisplay.innerHTML = `${enemy} sunk your cruiser`
+      this.infoMessageDisplay = `${enemy} sunk your cruiser`
       this.cpuCruiserCount = 10
     }
     if (this.cpuBattleshipCount === 4) {
-      //infoDisplay.innerHTML = `${enemy} sunk your battleship`
+      this.infoMessageDisplay = `${enemy} sunk your battleship`
       this.cpuBattleshipCount = 10
     }
     if (this.cpuCarrierCount === 5) {
-      //infoDisplay.innerHTML = `${enemy} sunk your carrier`
+      this.infoMessageDisplay = `${enemy} sunk your carrier`
       this.cpuCarrierCount = 10
     }
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
-      //infoDisplay.innerHTML = "YOU WIN"
+      this.infoMessageDisplay = "YOU WIN"
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
-      // infoDisplay.innerHTML = `${enemy.toUpperCase()} WINS`
+      this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
       this.gameOver()
     }
   }
