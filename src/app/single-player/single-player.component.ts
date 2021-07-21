@@ -96,6 +96,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.isGameStarted = !this.isGameStarted;
 
   }
+  
   playGameSinglePlayer() {
     if (this.isGameOver) return
     if (this.currentPlayer === 'user') {
