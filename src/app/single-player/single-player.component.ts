@@ -34,6 +34,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
   shotFired: number = -1
+  isTaken: any = true
 
   shipArray = [
     { name: 'destroyer', directions: [[0, 1], [0, this.width]] },
@@ -104,14 +105,30 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDragLeave(event: DragEvent) {
     console.log('drag leave', event);
   }
+  isSquareTaken(){
+    
+    this.isTaken = document.querySelectorAll('.taken')
+    this.isTaken.forEach( function(elements:any ) {
+      console.log(elements.getAttribute('data-headertext', "taken")
+    )})
 
+
+    
+  }
   onDrop(event: any) {
+    
+    let current:any = event.target.dataset.id
+    //const userTaken =  current.some((index: any) => this.userSquares[event?.target.dataset.id].classList.contains('taken'))
+    // let takenSquares:any
+    console.log(current, "current")
+    
     console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
     console.log(shipLastId, 'shipLastId');
+    
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
@@ -124,28 +141,37 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
     console.log(shipLastId, 'ThirdShipLastID');
+    
 
 
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
+    if (this.isHorizontal === true && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
+        this.isSquareTaken
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
+    } else if (this.isHorizontal === false && !newNotAllowedVertical.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
+        this.isSquareTaken
+     
+       
       }
     } else return
 
     this.displayGrid.nativeElement.removeChild(this.draggedShip)
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
+    //  takenSquares = this.userSquares.classes.contains("taken")
+    //  console.log(takenSquares, "taken squares")
+    this.isSquareTaken
+  
   }
 
 
