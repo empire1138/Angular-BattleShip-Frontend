@@ -27,7 +27,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   selectedShipNameWithIndex: any;
   draggedShip: any;
   draggedShipLength: any;
-  isGameOver:boolean = false
+  isGameOver: boolean = false
   currentPlayer: string = 'user'
   playerNum: number = 0
   ready: boolean = false
@@ -35,6 +35,20 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   allShipsPlaced: boolean = false
   shotFired: number = -1
   isTaken: any = true
+  gameMode: string = 'singlePlayer'
+  turnMessageDisplay: any;
+
+  cpuDestroyerCount: number = 0
+  cpuSubmarineCount: number = 0
+  cpuCruiserCount: number = 0
+  cpuBattleshipCount: number = 0
+  cpuCarrierCount: number = 0
+
+  destroyerCount: number = 0
+  submarineCount: number = 0
+  cruiserCount: number = 0
+  battleshipCount: number = 0
+  carrierCount: number = 0
 
   shipArray = [
     { name: 'destroyer', directions: [[0, 1], [0, this.width]] },
@@ -77,7 +91,92 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   startGame() {
+    this.generateComputerShips(this.shipArray[0]);
+    this.generateComputerShips(this.shipArray[1]);
+    this.generateComputerShips(this.shipArray[2]);
+    this.generateComputerShips(this.shipArray[3]);
+    this.generateComputerShips(this.shipArray[4]);
 
+    this.playGameSinglePlayer();
+
+  }
+  playGameSinglePlayer() {
+    // if (this.isGameOver) return
+    // if (this.currentPlayer === 'user') {
+    //   turnDisplay.innerHTML = 'Your Go'
+    //   this.computerSquares.forEach((square:any) => square.addEventListener('click', () => {
+    //     this.shotFired = square.dataset.id
+    //     this.revealSquare(square.classList)
+    //   }))
+    // }
+    // if (this.currentPlayer === 'enemy') {
+    //   turnDisplay.innerHTML = 'Computers Go'
+    //   setTimeout(this.enemyGoTurn(), 1000)
+    // }
+  }
+  revealSquare(classList: any) {
+    const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
+    const obj = Object.values(classList)
+    if (!enemySquare.classList.contains('boom') && this.currentPlayer === 'user' && !this.isGameOver) {
+      if (obj.includes('destroyer')) this.destroyerCount++
+      if (obj.includes('submarine')) this.submarineCount++
+      if (obj.includes('cruiser')) this.cruiserCount++
+      if (obj.includes('battleship')) this.battleshipCount++
+      if (obj.includes('carrier')) this.carrierCount++
+    }
+    if (obj.includes('taken')) {
+      enemySquare.classList.add('boom')
+    } else {
+      enemySquare.classList.add('miss')
+    }
+    this.checkForWins()
+    this.currentPlayer = 'enemy'
+    if(this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
+  }
+  enemyGoTurn(square: any) {
+    // if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
+    // if (!this.userSquares[square].classList.contains('boom')) {
+    //   const hit = this.userSquares[square].classList.contains('taken')
+    //   this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
+    //   if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
+    //   if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
+    //   if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
+    //   if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
+    //   if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
+    //   this.checkForWins()
+    // } else if (this.gameMode === 'singlePlayer') this.enemyGoTurn()
+    // this.currentPlayer = 'user'
+    // turnDisplay.innerHTML = 'Your Go'
+
+  }
+  checkForWins() {
+
+  }
+
+
+  //Draws the computer ships in random locations 
+  generateComputerShips(ship: any) {
+    let randomDirection = Math.floor(Math.random() * ship.directions.length)
+    let current = ship.directions[randomDirection]
+    console.log(current, 'current');
+    let direction: number = 0;
+
+    // if (randomDirection === 0) direction = 1
+    // if (randomDirection === 1) direction = 10
+    if (randomDirection === 0) {
+      direction = 1;
+    } else if (randomDirection === 1) { randomDirection = 10; }
+
+    let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
+
+    const isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    console.log(isTaken, 'isTaken');
+    const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
+    const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
+
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.computerSquares[randomStart + index].classList.add('taken', ship.name))
+
+    else this.generateComputerShips(ship)
   }
 
   //drag Events for the ships 
@@ -175,14 +274,14 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
 
-onDragEnter(event: any) {
-  event.preventDefault();
-  console.log('drag enter', event);
+  onDragEnter(event: any) {
+    event.preventDefault();
+    console.log('drag enter', event);
 
-}
-shipIDMouseDown(event: any) {
-  this.selectedShipNameWithIndex = event.target.id;
-}
+  }
+  shipIDMouseDown(event: any) {
+    this.selectedShipNameWithIndex = event.target.id;
+  }
 
 
 }
