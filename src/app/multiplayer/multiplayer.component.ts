@@ -64,7 +64,7 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.socketIO.setupSocketConnection();
+   
   }
 
   //Calling the functions
@@ -88,27 +88,42 @@ export class MultiplayerComponent implements OnInit {
   }
 
   startGame() {
-    this.generateComputerShips(this.shipArray[0]);
-    this.generateComputerShips(this.shipArray[1]);
-    this.generateComputerShips(this.shipArray[2]);
-    this.generateComputerShips(this.shipArray[3]);
-    this.generateComputerShips(this.shipArray[4]);
-
-    this.playGameSinglePlayer();
+    this.startMultiPlayer();
     this.isGameStarted = !this.isGameStarted;
 
   }
 
-  playGameSinglePlayer() {
-    this.computerSquares.forEach((square:any) => {
+  startMultiPlayer() {
+
+    //this should get the player number from the backend
+    this.socketIO.getPlayerNumber().subscribe((number: any) => {
+      if (number === -1) {
+        this.infoMessageDisplay =  "Sorry, the server is full"
+      } else {
+        this.playerNum = parseInt(number)
+        if (this.playerNum === 1) this.currentPlayer = "enemy"
+
+        console.log(this.playerNum)
+        this.socketIO.checkPLayersEmit();
+      }
+    })
+
+
+    //Setup listen for shots fired
+    this.computerSquares.forEach((square: any) => {
       square.addEventListener('click', () => {
-        if(this.currentPlayer === 'user' && this.ready && this.enemyReady) {
+        if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
-          this.socketIO.shotFired(this.shotFired); 
+          this.socketIO.shotFiredEmit(this.shotFired);
         }
       })
     })
   }
+
+  playerConnectedOrDisconnected(){
+    
+  }
+
   revealSquare(classList: any) {
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
     const obj = Object.values(classList)
@@ -126,23 +141,9 @@ export class MultiplayerComponent implements OnInit {
     }
     this.checkForWins()
     this.currentPlayer = 'enemy'
-    if (this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
   }
-  enemyGoTurn(square?: any) {
-    if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
-    if (!this.userSquares[square].classList.contains('boom')) {
-      const hit = this.userSquares[square].classList.contains('taken')
-      this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
-      if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
-      if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
-      if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
-      if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
-      if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
-      this.checkForWins()
-    } else if (this.gameMode === 'singlePlayer') this.enemyGoTurn()
-    this.currentPlayer = 'user'
 
-  }
+
   checkForWins() {
     let enemy = 'computer'
     if (this.gameMode === 'multiPlayer') enemy = 'enemy'
@@ -200,34 +201,6 @@ export class MultiplayerComponent implements OnInit {
   gameOver() {
     this.isGameOver = true
   }
-
-
-  //Draws the computer ships in random locations 
-  generateComputerShips(ship: any) {
-    let randomDirection = Math.floor(Math.random() * ship.directions.length)
-    let current = ship.directions[randomDirection]
-    console.log(current, 'current');
-    let direction: number = 0;
-
-    // if (randomDirection === 0) direction = 1
-    // if (randomDirection === 1) direction = 10
-    if (randomDirection === 0) {
-      direction = 1;
-    } else if (randomDirection === 1) { randomDirection = 10; }
-
-    let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
-
-    const isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
-    console.log(isTaken, 'isTaken');
-    const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
-    const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
-
-    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.computerSquares[randomStart + index].classList.add('taken', ship.name))
-
-    else this.generateComputerShips(ship)
-
-  }
-
 
   //drag Events for the ships 
   onDragStart(event: any) {

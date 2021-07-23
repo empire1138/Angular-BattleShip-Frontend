@@ -60,7 +60,7 @@
   (drop)="onDrop($event)"
   (mousedown)="shipIDMouseDown($event)"
 >
-  <div class="grid-display">
+  <div #displayGrid class="grid-display">
     <div
       class="ship destroyer-container"
       [ngClass]="

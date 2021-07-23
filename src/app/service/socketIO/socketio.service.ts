@@ -1,48 +1,66 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client'; 
+import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { ObserversModule } from '@angular/cdk/observers';
 @Injectable({
   providedIn: 'root'
 })
 export class SocketioService {
-  socket!: Socket;
+  socket: Socket = io('http://localhost:3000');
 
 
-  constructor() { }
-
-  setupSocketConnection(){
-    this.socket = io('http://localhost:3000')
-  }
-  getPlayerNumber(){
+  constructor() {
 
   }
-  playerConnection(){
+
+  setupSocketConnection() {
 
   }
-  enemyReady(){
+  getPlayerNumber() {
+
+    return new Observable((observer) => {
+      this.socket.on('players-num', number => {
+        observer.next(number);
+      })
+    })
+  }
+  playerConnectionReceived() {
+    return new Observable((observer) => {
+      this.socket.on('player-connection', num => {
+        observer.next(num);
+      })
+    })
+  }
+  enemyReady() {
 
   }
-  checkPLayers(){
+  checkPLayersEmit() {
+    this.socket.emit('check-players');
+  }
+  checkPlayersReceived() {
 
   }
-  shotFired(shotFired: number){
+  shotFiredEmit(shotFired: number) {
     this.socket.emit('fire', shotFired);
   }
-
-  timeOut(){
-
-  }
-  shotFiredReceived(){
+  shotFiredEmitReceived() {
 
   }
-  playerConnectedOrDisconnected(){
+
+  timeOut() {
 
   }
-  
+  shotFiredReceived() {
+
+  }
+  playerConnectedOrDisconnected() {
+
+  }
+
   disconnect() {
     if (this.socket) {
-        this.socket.disconnect();
-    }}
+      this.socket.disconnect();
+    }
+  }
 
 }
