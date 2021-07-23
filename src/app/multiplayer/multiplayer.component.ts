@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { asNativeElements, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SocketioService } from '../service/socketIO/socketio.service';
 import { ActivatedRoute } from '@angular/router';
+import { ThisReceiver } from '@angular/compiler';
 
 @Component({
   selector: 'app-multiplayer',
@@ -11,6 +12,7 @@ export class MultiplayerComponent implements OnInit {
   @ViewChild("userGrid") userGrid!: ElementRef;
   @ViewChild("computerGrid") computerGrid!: ElementRef;
   @ViewChild("displayGrid") displayGrid!: ElementRef;
+  @ViewChild("playerDisplay") playerDisplay!: ElementRef;
   //@ViewChild("destroyerContainer") destroyerContainer!: ElementRef; 
 
   width = 10;
@@ -64,24 +66,14 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-   
+    this.socketIO.setupSocketConnection();
+    this.playerNumberReceived();
+    this.playerConnection();
+    this.startMultiPlayer();
   }
 
-  //Calling the functions
 
-  //Making the functions for the game
-  createBoard(grid: any, squares: any) {
-    console.log(grid, 'CheckFive');
-    console.log(squares, 'checkSix');
-    for (let i = 0; i < (this.width * this.width); i++) {
-      let square = this.renderer.createElement('div');
-      square.dataset.id = i;
-      // grid.appendChild(square)
-      this.renderer.appendChild(grid.nativeElement, square);
-      squares.push(square);
-      //this.he.nativeElement.push(square)
-    }
-  }
+
 
   rotateShips() {
     this.isHorizontal = !this.isHorizontal;
@@ -95,18 +87,8 @@ export class MultiplayerComponent implements OnInit {
 
   startMultiPlayer() {
 
-    //this should get the player number from the backend
-    this.socketIO.getPlayerNumber().subscribe((number: any) => {
-      if (number === -1) {
-        this.infoMessageDisplay =  "Sorry, the server is full"
-      } else {
-        this.playerNum = parseInt(number)
-        if (this.playerNum === 1) this.currentPlayer = "enemy"
 
-        console.log(this.playerNum)
-        this.socketIO.checkPLayersEmit();
-      }
-    })
+
 
 
     //Setup listen for shots fired
@@ -114,16 +96,78 @@ export class MultiplayerComponent implements OnInit {
       square.addEventListener('click', () => {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
+          console.log(this.shotFired);
           this.socketIO.shotFiredEmit(this.shotFired);
         }
       })
     })
   }
 
-  playerConnectedOrDisconnected(){
-    
+  playerNumberReceived() {
+    //this should get the player number from the backend
+    this.socketIO.getPlayerNumber().subscribe((number: any) => {
+      if (number === -1) {
+        this.infoMessageDisplay = "Sorry, the server is full"
+      } else {
+        this.playerNum = parseInt(number)
+        if (this.playerNum === 1) this.currentPlayer = "enemy"
+
+        console.log(this.playerNum, 'PLayerNumber')
+        this.socketIO.checkPLayersEmit();
+      }
+    })
   }
 
+  playerEnemyReady() {
+    this.socketIO.enemyReady().subscribe((number: any) => {
+      this.enemyReady = true;
+      this.playerReady(number);
+    })
+  }
+
+  playerReady(number: any) {
+    let player = `.p${parseInt(number) + 1}`
+    this.playerDisplay.nativeElement.querySelector(`${player} .ready`).classList.toggle('active')
+  }
+
+  playerConnection() {
+    this.socketIO.playerConnectionReceived().subscribe((number: any) => {
+      console.log(`Player number ${number} has connected or disconnected`)
+      this.playerConnectedOrDisconnected(number);
+    })
+  }
+
+  playerConnectedOrDisconnected(number: any) {
+    let player = `.p${parseInt(number) + 1}`
+    this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
+    if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
+  }
+
+  playGameMulti(){
+    if(this.isGameOver) return;
+    if(!this.ready) {
+      this.socketIO.playerReadyEmit();
+      this.ready = true
+      this.playerReady(this.playerNum)
+    }
+  } 
+
+
+  //Making grid for each players
+  createBoard(grid: any, squares: any) {
+    //console.log(grid, 'CheckFive');
+    //console.log(squares, 'checkSix');
+    for (let i = 0; i < (this.width * this.width); i++) {
+      let square = this.renderer.createElement('div');
+      square.dataset.id = i;
+      // grid.appendChild(square)
+      this.renderer.appendChild(grid.nativeElement, square);
+      squares.push(square);
+      //this.he.nativeElement.push(square)
+    }
+  }
+
+  //This displays the grid spot 
   revealSquare(classList: any) {
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
     const obj = Object.values(classList)
@@ -206,35 +250,35 @@ export class MultiplayerComponent implements OnInit {
   onDragStart(event: any) {
     this.draggedShip = event.target
     this.draggedShipLength = this.draggedShip.childNodes.length;
-    console.log(this.draggedShip, 'draggedShip')
-    console.log(this.draggedShipLength, 'draggedShipLength');
+    //console.log(this.draggedShip, 'draggedShip')
+    //console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
-    console.log('dragging', event);
+    //console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
-    console.log('drag over', event);
-    console.log(event.target)
+    //console.log('drag over', event);
+    //console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
-    console.log('drag end', event);
+    //console.log('drag end', event);
 
   }
   onDragLeave(event: DragEvent) {
-    console.log('drag leave', event);
+    //console.log('drag leave', event);
   }
 
   onDrop(event: any) {
-    console.log(event.target.dataset.id, 'dataset.id')
+    //console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    console.log(shipLastId, 'shipLastId');
+    //console.log(shipLastId, 'shipLastId');
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
@@ -243,10 +287,10 @@ export class MultiplayerComponent implements OnInit {
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-    console.log(shipLastId, 'SecondShipLastID')
-    console.log(selectedShipIndex, 'selectedShipIndex');
+    // console.log(shipLastId, 'SecondShipLastID')
+    //console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
-    console.log(shipLastId, 'ThirdShipLastID');
+    //console.log(shipLastId, 'ThirdShipLastID');
 
 
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
@@ -274,7 +318,7 @@ export class MultiplayerComponent implements OnInit {
 
   onDragEnter(event: any) {
     event.preventDefault();
-    console.log('drag enter', event);
+    //console.log('drag enter', event);
 
   }
   shipIDMouseDown(event: any) {

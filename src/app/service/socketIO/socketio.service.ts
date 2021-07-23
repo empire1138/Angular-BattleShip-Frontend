@@ -6,7 +6,7 @@ import { ObserversModule } from '@angular/cdk/observers';
   providedIn: 'root'
 })
 export class SocketioService {
-  socket: Socket = io('http://localhost:3000');
+  socket!: Socket;
 
 
   constructor() {
@@ -14,37 +14,53 @@ export class SocketioService {
   }
 
   setupSocketConnection() {
-
+    this.socket = io('http://localhost:3000');
+    this.socket.emit('players-number')
+    console.log('fired');
   }
-  getPlayerNumber() {
-
+  getPlayerNumber(): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on('players-num', number => {
+      this.socket.on('player-number', number => {
+        console.log(number, 'NumberSocket')
         observer.next(number);
       })
     })
   }
-  playerConnectionReceived() {
+  playerConnectionReceived(): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on('player-connection', num => {
+      this.socket.on('player-connection', (num:any) => {
+        console.log('PlayConnections')
         observer.next(num);
       })
     })
   }
+  playerReadyEmit(){
+    this.socket.emit('player-ready'); 
+  }
   enemyReady() {
-
+    return new Observable((observer) => {
+      this.socket.on('enemy-ready', (num:any) => {
+        observer.next(num);
+      })
+    })
   }
   checkPLayersEmit() {
     this.socket.emit('check-players');
+    console.log('fired@2')
   }
   checkPlayersReceived() {
 
   }
   shotFiredEmit(shotFired: number) {
     this.socket.emit('fire', shotFired);
+    console.log('Real Shot Sent');
   }
   shotFiredEmitReceived() {
-
+    return new Observable((observer) =>{
+      this.socket.on('fire', (id:any) => {
+        observer.next(id); 
+      })
+    })
   }
 
   timeOut() {
