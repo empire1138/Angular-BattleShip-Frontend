@@ -325,8 +325,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     this.displayGrid.nativeElement.removeChild(this.draggedShip)
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
-    //  takenSquares = this.userSquares.classes.contains("taken")
-    //  console.log(takenSquares, "taken squares")
+      // takenSquares = this.userSquares.classes.contains("taken")
+     //console.log(takenSquares, "taken squares")
     this.isSquareTaken
   
   }
