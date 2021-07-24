@@ -24,6 +24,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   userSquares: any = []
   computerSquares: any = []
   isHorizontal: boolean = true;
+  isGameStarted: boolean = false;
   selectedShipNameWithIndex: any;
   draggedShip: any;
   draggedShipLength: any;
@@ -36,7 +37,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   shotFired: number = -1
   isTaken: any = true
   gameMode: string = 'singlePlayer'
-  turnMessageDisplay: any;
+  infoMessageDisplay: string = '';
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -98,21 +99,23 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.generateComputerShips(this.shipArray[4]);
 
     this.playGameSinglePlayer();
+    this.isGameStarted = !this.isGameStarted;
 
   }
+  
   playGameSinglePlayer() {
-    // if (this.isGameOver) return
-    // if (this.currentPlayer === 'user') {
-    //   turnDisplay.innerHTML = 'Your Go'
-    //   this.computerSquares.forEach((square:any) => square.addEventListener('click', () => {
-    //     this.shotFired = square.dataset.id
-    //     this.revealSquare(square.classList)
-    //   }))
-    // }
-    // if (this.currentPlayer === 'enemy') {
-    //   turnDisplay.innerHTML = 'Computers Go'
-    //   setTimeout(this.enemyGoTurn(), 1000)
-    // }
+    if (this.isGameOver) return
+    if (this.currentPlayer === 'user') {
+      this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
+        this.shotFired = square.dataset.id
+        this.revealSquare(square.classList)
+      }))
+    }
+    if (this.currentPlayer === 'enemy') {
+      setTimeout(() => {
+        this.enemyGoTurn()
+      }, 1000);
+    }
   }
   revealSquare(classList: any) {
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
@@ -131,26 +134,79 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     }
     this.checkForWins()
     this.currentPlayer = 'enemy'
-    if(this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
+    if (this.gameMode === 'singlePlayer') this.playGameSinglePlayer()
   }
-  enemyGoTurn(square: any) {
-    // if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
-    // if (!this.userSquares[square].classList.contains('boom')) {
-    //   const hit = this.userSquares[square].classList.contains('taken')
-    //   this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
-    //   if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
-    //   if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
-    //   if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
-    //   if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
-    //   if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
-    //   this.checkForWins()
-    // } else if (this.gameMode === 'singlePlayer') this.enemyGoTurn()
-    // this.currentPlayer = 'user'
-    // turnDisplay.innerHTML = 'Your Go'
+  enemyGoTurn(square?: any) {
+    if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
+    if (!this.userSquares[square].classList.contains('boom')) {
+      const hit = this.userSquares[square].classList.contains('taken')
+      this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
+      if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
+      if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
+      if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
+      if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
+      if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
+      this.checkForWins()
+    } else if (this.gameMode === 'singlePlayer') this.enemyGoTurn()
+    this.currentPlayer = 'user'
 
   }
   checkForWins() {
+    let enemy = 'computer'
+    if (this.gameMode === 'multiPlayer') enemy = 'enemy'
+    if (this.destroyerCount === 2) {
+      this.infoMessageDisplay = `You sunk the ${enemy}'s destroyer`
+      this.destroyerCount = 10
+    }
+    if (this.submarineCount === 3) {
+      this.infoMessageDisplay = `You sunk the ${enemy}'s submarine`
+      this.submarineCount = 10
+    }
+    if (this.cruiserCount === 3) {
+      this.infoMessageDisplay = `You sunk the ${enemy}'s cruiser`
+      this.cruiserCount = 10
+    }
+    if (this.battleshipCount === 4) {
+      this.infoMessageDisplay = `You sunk the ${enemy}'s battleship`
+      this.battleshipCount = 10
+    }
+    if (this.carrierCount === 5) {
+      this.infoMessageDisplay = `You sunk the ${enemy}'s carrier`
+      this.carrierCount = 10
+    }
+    if (this.cpuDestroyerCount === 2) {
+      this.infoMessageDisplay = `${enemy} sunk your destroyer`
+      this.cpuDestroyerCount = 10
+    }
+    if (this.cpuSubmarineCount === 3) {
+      this.infoMessageDisplay = `${enemy} sunk your submarine`
+      this.cpuSubmarineCount = 10
+    }
+    if (this.cpuCruiserCount === 3) {
+      this.infoMessageDisplay = `${enemy} sunk your cruiser`
+      this.cpuCruiserCount = 10
+    }
+    if (this.cpuBattleshipCount === 4) {
+      this.infoMessageDisplay = `${enemy} sunk your battleship`
+      this.cpuBattleshipCount = 10
+    }
+    if (this.cpuCarrierCount === 5) {
+      this.infoMessageDisplay = `${enemy} sunk your carrier`
+      this.cpuCarrierCount = 10
+    }
 
+    if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
+      this.infoMessageDisplay = "YOU WIN"
+      this.gameOver()
+    }
+    if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
+      this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.gameOver()
+    }
+  }
+
+  gameOver() {
+    this.isGameOver = true
   }
 
 
@@ -177,7 +233,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.computerSquares[randomStart + index].classList.add('taken', ship.name))
 
     else this.generateComputerShips(ship)
+
   }
+
 
   //drag Events for the ships 
   onDragStart(event: any) {

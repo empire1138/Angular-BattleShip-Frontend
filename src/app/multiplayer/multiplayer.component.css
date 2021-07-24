@@ -303,3 +303,7 @@ body {
   opacity: 1;
   text-decoration: none;
 }
+
+.disabled-color{
+  background-color: Red;
+}
