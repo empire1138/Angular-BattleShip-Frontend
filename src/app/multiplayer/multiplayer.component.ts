@@ -158,7 +158,7 @@ export class MultiplayerComponent implements OnInit {
   checkPlayersReceiver() {
     this.socketIO.checkPlayersReceived().subscribe((players: any) => {
       players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
-        if (p.connected) playerConnectedOrDisconnected(i)
+        if (p.connected) this.playerConnectedOrDisconnected(i)
         if (p.ready) {
           this.playerReady(i)
           if (i !== this.playerReady) this.enemyReady = true
