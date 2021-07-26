@@ -34,7 +34,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
   shotFired: number = -1
-  isTaken: any = true
+  takenSquares: any = []
   gameMode: string = 'singlePlayer'
   turnMessageDisplay: any;
 
@@ -205,11 +205,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log('drag leave', event);
   }
   isSquareTaken(){
-    
-    this.isTaken = document.querySelectorAll('.taken')
-    this.isTaken.forEach( function(elements:any ) {
-      console.log(elements.getAttribute('data-headertext', "taken")
-    )})
+   
+   
+    this.userSquares.array.forEach((squares: any)=> squares.contains('taken',()=>{this.takenSquares = squares.dataset.id ;console.log(squares.dataset.id, "taken squares")}),{
+      
+      
+    });
+   
 
 
     
@@ -240,7 +242,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
     console.log(shipLastId, 'ThirdShipLastID');
-    
+    this.isSquareTaken()
 
 
     if (this.isHorizontal === true && !newNotAllowedHorizontal.includes(shipLastId)) {
@@ -249,7 +251,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
-        this.isSquareTaken
+        
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
@@ -259,18 +261,18 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
-        this.isSquareTaken
-     
+        
+      
        
       }
     } else return
-
-    this.displayGrid.nativeElement.removeChild(this.draggedShip)
-    if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
-    //  takenSquares = this.userSquares.classes.contains("taken")
+      this.displayGrid.nativeElement.removeChild(this.draggedShip)
+      if(!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
+     //  takenSquares = this.userSquares.classes.contains("taken")
     //  console.log(takenSquares, "taken squares")
-    this.isSquareTaken
-  
+   
+    
+ 
   }
 
 
