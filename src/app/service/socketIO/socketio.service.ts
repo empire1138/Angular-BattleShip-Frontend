@@ -15,7 +15,7 @@ export class SocketioService {
 
   setupSocketConnection() {
     this.socket = io('http://localhost:3000');
-    this.socket.emit('players-number')
+    this.socket.emit('player-number')
     console.log('fired');
   }
   getPlayerNumber(): Observable<any> {
@@ -44,16 +44,23 @@ export class SocketioService {
       })
     })
   }
-  checkPLayersEmit() {
+  checkPlayersEmit() {
     this.socket.emit('check-players');
     console.log('fired@2')
   }
   checkPlayersReceived() {
-
+    return new Observable((observer) => {
+      this.socket.on('check-players', (players: any) => {
+        observer.next(players); 
+      }) 
+    })
   }
   shotFiredEmit(shotFired: number) {
     this.socket.emit('fire', shotFired);
     console.log('Real Shot Sent');
+  }
+  shotFiredReplyEmit(squareClassList:any){
+    this.socket.emit('fire-reply', squareClassList);     
   }
   shotFiredEmitReceived() {
     return new Observable((observer) =>{
@@ -62,14 +69,22 @@ export class SocketioService {
       })
     })
   }
+  shotFiredReplyReceived(){
+    return new Observable( (observer) => {
+      this.socket.on('fire-reply' , (classList: any) => {
+        observer.next(classList); 
+      })
+    })
+  }
 
   timeOut() {
-
+    return new Observable((observer) => {
+      this.socket.on('timeout', () => {
+        observer.next();
+      })
+    })
   }
   shotFiredReceived() {
-
-  }
-  playerConnectedOrDisconnected() {
 
   }
 

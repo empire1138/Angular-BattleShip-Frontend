@@ -3,6 +3,7 @@ import { SocketioService } from '../service/socketIO/socketio.service';
 import { ActivatedRoute } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
 
+
 @Component({
   selector: 'app-multiplayer',
   templateUrl: './multiplayer.component.html',
@@ -30,7 +31,7 @@ export class MultiplayerComponent implements OnInit {
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
   shotFired: number = -1
-  gameMode: string = 'singlePlayer'
+  gameMode: string = 'multiPlayer'
   infoMessageDisplay: string = 'Place the ships on the game grid then click Start Game';
 
   cpuDestroyerCount: number = 0
@@ -66,45 +67,57 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.socketIO.setupSocketConnection();
-    this.playerNumberReceived();
-    this.playerConnection();
     this.startMultiPlayer();
+    this.timedOut();
   }
-
-
-
 
   rotateShips() {
     this.isHorizontal = !this.isHorizontal;
   }
 
   startGame() {
-    this.startMultiPlayer();
+    this.playGameMulti();
     this.isGameStarted = !this.isGameStarted;
 
   }
 
+  
   startMultiPlayer() {
+    //Step 1 Setup the connection and request for a Player Number. In socketIO Service
+    this.socketIO.setupSocketConnection();
+    // Step 2 Receive the player number
+    this.playerNumberReceived();
+    // Step 3 Another player has connected or disconnected
+    this.playerConnection();
+    // Step 4 "enemyplayer" ready
+    this.playerEnemyReady();  
+    //Step 5 Check player Status 
+    this. checkPlayersReceiver(); 
+    //step 6 timeout Check Limit 
+    this.timedOut(); 
 
-
-
-
-
-    //Setup listen for shots fired
+    // step 7- Setup listen for shots fired
     this.computerSquares.forEach((square: any) => {
       square.addEventListener('click', () => {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
           console.log(this.shotFired);
+          //step 7-A
           this.socketIO.shotFiredEmit(this.shotFired);
         }
       })
     })
+
+    //Step 8 
+    this.fireReceived();
+    //Step 9 
+    this.fireRelyReceived();    
   }
 
+  //Step 2
   playerNumberReceived() {
-    //this should get the player number from the backend
+    //this should get the player number from the backend then ask for other players connection.
+    //step 2-A Receive
     this.socketIO.getPlayerNumber().subscribe((number: any) => {
       if (number === -1) {
         this.infoMessageDisplay = "Sorry, the server is full"
@@ -113,15 +126,67 @@ export class MultiplayerComponent implements OnInit {
         if (this.playerNum === 1) this.currentPlayer = "enemy"
 
         console.log(this.playerNum, 'PLayerNumber')
-        this.socketIO.checkPLayersEmit();
+        //Step 2-B Request for other players connection Emit
+        this.socketIO.checkPlayersEmit();
       }
     })
   }
 
+  //Step 3. Receive
+  playerConnection() {
+    this.socketIO.playerConnectionReceived().subscribe((number: any) => {
+      console.log(`Player number ${number} has connected or disconnected`)
+      //Step 3-A calls function to display the Info on Screen
+      this.playerConnectedOrDisconnected(number);
+    })
+  }
+  //Step 3-A 
+  playerConnectedOrDisconnected(number: any) {
+    let player = `.p${parseInt(number) + 1}`
+    this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
+    if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
+  }
+
+ //Step 4 On enemy ready move forward with the game  Receive
   playerEnemyReady() {
     this.socketIO.enemyReady().subscribe((number: any) => {
       this.enemyReady = true;
       this.playerReady(number);
+    })
+  }
+  //Step 5. Check player status Receive
+  checkPlayersReceiver() {
+    this.socketIO.checkPlayersReceived().subscribe((players: any) => {
+      players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
+        if (p.connected) playerConnectedOrDisconnected(i)
+        if (p.ready) {
+          this.playerReady(i)
+          if (i !== this.playerReady) this.enemyReady = true
+        }})
+    })
+  }
+
+
+  // Step 6 Server API tracking the time limit Receive 
+  timedOut(){
+    this.socketIO.timeOut().subscribe(() => {
+      this.infoMessageDisplay = "You have reached the 10 minute limit"
+    })
+  }
+ //Step 8
+  fireReceived(){
+    this.socketIO.shotFiredEmitReceived().subscribe((id:any) => {
+      this.enemyGo(id)
+      const square = this.userSquares[id]
+      this.socketIO.shotFiredReplyEmit(square.classList)
+      this.playGameMulti();
+    })
+  }
+  //Step 9
+  fireRelyReceived(){
+    this.socketIO.shotFiredReplyReceived().subscribe((classList: any) => {
+      this.revealSquare(classList);
+      this.playGameMulti(); 
     })
   }
 
@@ -130,28 +195,29 @@ export class MultiplayerComponent implements OnInit {
     this.playerDisplay.nativeElement.querySelector(`${player} .ready`).classList.toggle('active')
   }
 
-  playerConnection() {
-    this.socketIO.playerConnectionReceived().subscribe((number: any) => {
-      console.log(`Player number ${number} has connected or disconnected`)
-      this.playerConnectedOrDisconnected(number);
-    })
-  }
+  
 
-  playerConnectedOrDisconnected(number: any) {
-    let player = `.p${parseInt(number) + 1}`
-    this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
-    if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
-  }
+  
+  
 
-  playGameMulti(){
-    if(this.isGameOver) return;
-    if(!this.ready) {
+  playGameMulti() {
+    if (this.isGameOver) return;
+    if (!this.ready) {
       this.socketIO.playerReadyEmit();
       this.ready = true
       this.playerReady(this.playerNum)
     }
-  } 
+    if (this.enemyReady) {
+      if (this.currentPlayer === 'user') {
+        this.infoMessageDisplay = 'Your Go'
+      }
+      if (this.currentPlayer === 'enemy') {
+        this.infoMessageDisplay = "Enemy's Go"
+      }
+    }
+  }
 
+  
 
   //Making grid for each players
   createBoard(grid: any, squares: any) {
@@ -185,6 +251,22 @@ export class MultiplayerComponent implements OnInit {
     }
     this.checkForWins()
     this.currentPlayer = 'enemy'
+  }
+
+  enemyGo(square?:any ) {
+    if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
+    if (!this.userSquares[square].classList.contains('boom')) {
+      const hit = this.userSquares[square].classList.contains('taken')
+      this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
+      if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
+      if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
+      if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
+      if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
+      if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
+      this.checkForWins()
+    } else if (this.gameMode === 'singlePlayer') this.enemyGo()
+    this.currentPlayer = 'user'
+    this.infoMessageDisplay = 'Your Go'
   }
 
 
@@ -327,3 +409,11 @@ export class MultiplayerComponent implements OnInit {
 
 
 }
+function playerConnectedOrDisconnected(i: any) {
+  throw new Error('Function not implemented.');
+}
+
+function player(player: any) {
+  throw new Error('Function not implemented.');
+}
+
