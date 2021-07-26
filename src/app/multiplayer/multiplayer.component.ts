@@ -3,6 +3,7 @@ import { SocketioService } from '../service/socketIO/socketio.service';
 import { ActivatedRoute } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
 
+
 @Component({
   selector: 'app-multiplayer',
   templateUrl: './multiplayer.component.html',
@@ -30,7 +31,7 @@ export class MultiplayerComponent implements OnInit {
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
   shotFired: number = -1
-  gameMode: string = 'singlePlayer'
+  gameMode: string = 'multiPlayer'
   infoMessageDisplay: string = 'Place the ships on the game grid then click Start Game';
 
   cpuDestroyerCount: number = 0
@@ -88,6 +89,12 @@ export class MultiplayerComponent implements OnInit {
     this.playerNumberReceived();
     // Step 3 Another player has connected or disconnected
     this.playerConnection();
+    // Step 4 "enemyplayer" ready
+    this.playerEnemyReady();  
+    //Step 5 Check player Status 
+    this. checkPlayersReceiver(); 
+    //step 6 timeout Check Limit 
+    this.timedOut(); 
 
     // step 7- Setup listen for shots fired
     this.computerSquares.forEach((square: any) => {
@@ -100,6 +107,11 @@ export class MultiplayerComponent implements OnInit {
         }
       })
     })
+
+    //Step 8 
+    this.fireReceived();
+    //Step 9 
+    this.fireRelyReceived();    
   }
 
   //Step 2
@@ -159,6 +171,22 @@ export class MultiplayerComponent implements OnInit {
   timedOut(){
     this.socketIO.timeOut().subscribe(() => {
       this.infoMessageDisplay = "You have reached the 10 minute limit"
+    })
+  }
+ //Step 8
+  fireReceived(){
+    this.socketIO.shotFiredEmitReceived().subscribe((id:any) => {
+      this.enemyGo(id)
+      const square = this.userSquares[id]
+      this.socketIO.shotFiredReplyEmit(square.classList)
+      this.playGameMulti();
+    })
+  }
+  //Step 9
+  fireRelyReceived(){
+    this.socketIO.shotFiredReplyReceived().subscribe((classList: any) => {
+      this.revealSquare(classList);
+      this.playGameMulti(); 
     })
   }
 
@@ -223,6 +251,22 @@ export class MultiplayerComponent implements OnInit {
     }
     this.checkForWins()
     this.currentPlayer = 'enemy'
+  }
+
+  enemyGo(square?:any ) {
+    if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
+    if (!this.userSquares[square].classList.contains('boom')) {
+      const hit = this.userSquares[square].classList.contains('taken')
+      this.userSquares[square].classList.add(hit ? 'boom' : 'miss')
+      if (this.userSquares[square].classList.contains('destroyer')) this.cpuDestroyerCount++
+      if (this.userSquares[square].classList.contains('submarine')) this.cpuSubmarineCount++
+      if (this.userSquares[square].classList.contains('cruiser')) this.cpuCruiserCount++
+      if (this.userSquares[square].classList.contains('battleship')) this.cpuBattleshipCount++
+      if (this.userSquares[square].classList.contains('carrier')) this.cpuCarrierCount++
+      this.checkForWins()
+    } else if (this.gameMode === 'singlePlayer') this.enemyGo()
+    this.currentPlayer = 'user'
+    this.infoMessageDisplay = 'Your Go'
   }
 
 

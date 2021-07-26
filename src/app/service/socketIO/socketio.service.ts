@@ -59,10 +59,20 @@ export class SocketioService {
     this.socket.emit('fire', shotFired);
     console.log('Real Shot Sent');
   }
+  shotFiredReplyEmit(squareClassList:any){
+    this.socket.emit('fire-reply', squareClassList);     
+  }
   shotFiredEmitReceived() {
     return new Observable((observer) =>{
       this.socket.on('fire', (id:any) => {
         observer.next(id); 
+      })
+    })
+  }
+  shotFiredReplyReceived(){
+    return new Observable( (observer) => {
+      this.socket.on('fire-reply' , (classList: any) => {
+        observer.next(classList); 
       })
     })
   }
