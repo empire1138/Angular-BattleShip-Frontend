@@ -32,7 +32,7 @@ export class MultiplayerComponent implements OnInit {
   allShipsPlaced: boolean = false
   shotFired: number = -1
   gameMode: string = 'multiPlayer'
-  infoMessageDisplay: string = 'Place the ships on the game grid then click Start Game';
+  infoMessageDisplay: string = '';
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -67,23 +67,8 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.startMultiPlayer();
-    this.timedOut();
-  }
-
-  rotateShips() {
-    this.isHorizontal = !this.isHorizontal;
-  }
-
-  startGame() {
-    this.playGameMulti();
-    this.isGameStarted = !this.isGameStarted;
-
-  }
-
-  
-  startMultiPlayer() {
-    //Step 1 Setup the connection and request for a Player Number. In socketIO Service
+    this.infoMessageDisplay="Place the ships on the game grid then click Start Game"
+     //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
     // Step 2 Receive the player number
     this.playerNumberReceived();
@@ -95,23 +80,43 @@ export class MultiplayerComponent implements OnInit {
     this. checkPlayersReceiver(); 
     //step 6 timeout Check Limit 
     this.timedOut(); 
+    //Step 7
+    this.fireReceived();
+    //Step 8
+    this.fireRelyReceived();  
+    
+  }
 
-    // step 7- Setup listen for shots fired
+  rotateShips() {
+    this.isHorizontal = !this.isHorizontal;
+  }
+
+  startGame() {
+    this.startMultiPlayer();
+    this.playGameMulti();
+    this.isGameStarted = !this.isGameStarted;
+    this.infoMessageDisplay = '';
+  }
+
+  
+  startMultiPlayer() {
+   
+
+    console.log(this.currentPlayer, 'current player');
+    console.log(this.ready, 'this.ready')
+    console.log(this.enemyReady, 'enemyReady'); 
     this.computerSquares.forEach((square: any) => {
       square.addEventListener('click', () => {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
-          console.log(this.shotFired);
-          //step 7-A
+          console.log(this.shotFired,'shotFIRED');
+          //Step 10
           this.socketIO.shotFiredEmit(this.shotFired);
         }
       })
     })
 
-    //Step 8 
-    this.fireReceived();
-    //Step 9 
-    this.fireRelyReceived();    
+      
   }
 
   //Step 2
@@ -173,16 +178,18 @@ export class MultiplayerComponent implements OnInit {
       this.infoMessageDisplay = "You have reached the 10 minute limit"
     })
   }
- //Step 8
+ //Step 7
   fireReceived(){
+    //Step 7-A
     this.socketIO.shotFiredEmitReceived().subscribe((id:any) => {
       this.enemyGo(id)
       const square = this.userSquares[id]
+      //Step 7-B
       this.socketIO.shotFiredReplyEmit(square.classList)
       this.playGameMulti();
     })
   }
-  //Step 9
+  //Step 8
   fireRelyReceived(){
     this.socketIO.shotFiredReplyReceived().subscribe((classList: any) => {
       this.revealSquare(classList);
@@ -203,16 +210,17 @@ export class MultiplayerComponent implements OnInit {
   playGameMulti() {
     if (this.isGameOver) return;
     if (!this.ready) {
+      //Step 9
       this.socketIO.playerReadyEmit();
       this.ready = true
       this.playerReady(this.playerNum)
     }
     if (this.enemyReady) {
       if (this.currentPlayer === 'user') {
-        this.infoMessageDisplay = 'Your Go'
+       //this.infoMessageDisplay = 'Your Go'
       }
       if (this.currentPlayer === 'enemy') {
-        this.infoMessageDisplay = "Enemy's Go"
+        //this.infoMessageDisplay = "Enemy's Go"
       }
     }
   }
@@ -266,11 +274,18 @@ export class MultiplayerComponent implements OnInit {
       this.checkForWins()
     } else if (this.gameMode === 'singlePlayer') this.enemyGo()
     this.currentPlayer = 'user'
-    this.infoMessageDisplay = 'Your Go'
+    //this.infoMessageDisplay = 'Your Go'
+    // console.log(this.cpuDestroyerCount, 'cpuDestroyerCount')
+    // console.log(this.cpuSubmarineCount, 'cpuSubCount')
+    // console.log(this.cpuCruiserCount, 'cpuCruiserCount')
+    // console.log(this.cpuBattleshipCount, 'cpuBattleCount')
+    // console.log(this.cpuCarrierCount, 'cpuCarrierCount')
+    console.log(this.infoMessageDisplay, 'infoMessageDisplay')
   }
 
 
   checkForWins() {
+    console.log(this.infoMessageDisplay, 'infoMessageDisplay')
     let enemy = 'computer'
     if (this.gameMode === 'multiPlayer') enemy = 'enemy'
     if (this.destroyerCount === 2) {
@@ -409,11 +424,3 @@ export class MultiplayerComponent implements OnInit {
 
 
 }
-function playerConnectedOrDisconnected(i: any) {
-  throw new Error('Function not implemented.');
-}
-
-function player(player: any) {
-  throw new Error('Function not implemented.');
-}
-
