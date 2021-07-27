@@ -80,9 +80,9 @@ export class MultiplayerComponent implements OnInit {
     this. checkPlayersReceiver(); 
     //step 6 timeout Check Limit 
     this.timedOut(); 
-    //Step 8 
+    //Step 7
     this.fireReceived();
-    //Step 9 
+    //Step 8
     this.fireRelyReceived();  
     
   }
@@ -110,7 +110,7 @@ export class MultiplayerComponent implements OnInit {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
           console.log(this.shotFired,'shotFIRED');
-          //step 7-A
+          //Step 10
           this.socketIO.shotFiredEmit(this.shotFired);
         }
       })
@@ -178,16 +178,18 @@ export class MultiplayerComponent implements OnInit {
       this.infoMessageDisplay = "You have reached the 10 minute limit"
     })
   }
- //Step 8
+ //Step 7
   fireReceived(){
+    //Step 7-A
     this.socketIO.shotFiredEmitReceived().subscribe((id:any) => {
       this.enemyGo(id)
       const square = this.userSquares[id]
+      //Step 7-B
       this.socketIO.shotFiredReplyEmit(square.classList)
       this.playGameMulti();
     })
   }
-  //Step 9
+  //Step 8
   fireRelyReceived(){
     this.socketIO.shotFiredReplyReceived().subscribe((classList: any) => {
       this.revealSquare(classList);
@@ -208,6 +210,7 @@ export class MultiplayerComponent implements OnInit {
   playGameMulti() {
     if (this.isGameOver) return;
     if (!this.ready) {
+      //Step 9
       this.socketIO.playerReadyEmit();
       this.ready = true
       this.playerReady(this.playerNum)

@@ -12,11 +12,12 @@ export class SocketioService {
   constructor() {
 
   }
-
+  //Step 1
   setupSocketConnection() {
     this.socket = io('http://localhost:3000');
     this.socket.emit('player-number')
   }
+  //Step 2-A 
   getPlayerNumber(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('player-number', number => {
@@ -25,57 +26,37 @@ export class SocketioService {
       })
     })
   }
+  //Step 2-B
+  checkPlayersEmit() {
+    this.socket.emit('check-players');
+    console.log('fired@2')
+  }
+  //Step 3
   playerConnectionReceived(): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on('player-connection', (num:any) => {
+      this.socket.on('player-connection', (num: any) => {
         console.log('PlayConnections')
         observer.next(num);
       })
     })
   }
-  playerReadyEmit(){
-    this.socket.emit('player-ready'); 
-  }
+  // Step 4 
   enemyReady() {
     return new Observable((observer) => {
-      this.socket.on('enemy-ready', (num:any) => {
+      this.socket.on('enemy-ready', (num: any) => {
         observer.next(num);
       })
     })
   }
-  checkPlayersEmit() {
-    this.socket.emit('check-players');
-    console.log('fired@2')
-  }
+  //Step 5 
   checkPlayersReceived() {
     return new Observable((observer) => {
       this.socket.on('check-players', (players: any) => {
-        observer.next(players); 
-      }) 
-    })
-  }
-  shotFiredEmit(shotFired: number) {
-    this.socket.emit('fire', shotFired);
-    console.log('Real Shot Sent');
-  }
-  shotFiredReplyEmit(squareClassList:any){
-    this.socket.emit('fire-reply', squareClassList);     
-  }
-  shotFiredEmitReceived() {
-    return new Observable((observer) =>{
-      this.socket.on('fire', (id:any) => {
-        observer.next(id); 
+        observer.next(players);
       })
     })
   }
-  shotFiredReplyReceived(){
-    return new Observable( (observer) => {
-      this.socket.on('fire-reply' , (classList: any) => {
-        observer.next(classList); 
-      })
-    })
-  }
-
+  //Step 6 
   timeOut() {
     return new Observable((observer) => {
       this.socket.on('timeout', () => {
@@ -83,9 +64,38 @@ export class SocketioService {
       })
     })
   }
-  shotFiredReceived() {
-
+  //Step 7-A
+  shotFiredEmitReceived() {
+    return new Observable((observer) => {
+      this.socket.on('fire', (id: any) => {
+        observer.next(id);
+      })
+    })
   }
+  //Step 7-B
+  shotFiredReplyEmit(squareClassList: any) {
+    this.socket.emit('fire-reply', squareClassList);
+  }
+  //Step 8
+  shotFiredReplyReceived() {
+    return new Observable((observer) => {
+      this.socket.on('fire-reply', (classList: any) => {
+        observer.next(classList);
+      })
+    })
+  }
+  //Step 9 This starts after the user clicks the Start button
+playerReadyEmit() {
+    this.socket.emit('player-ready');
+  }
+  //Step 10 This is fired after each click from the user 
+  shotFiredEmit(shotFired: number) {
+    this.socket.emit('fire', shotFired);
+    console.log('Real Shot Sent');
+  }
+
+
+  
 
   disconnect() {
     if (this.socket) {
