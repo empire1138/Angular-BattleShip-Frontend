@@ -272,14 +272,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     })
   }
 
-
-
-
-
-
-
-
-
   onDrop(event: any) {
 
     let current: any = event.target.dataset.id
@@ -315,7 +307,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
-        
+
 
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
@@ -326,9 +318,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
-        
-
-
 
       }
     } else return
@@ -350,6 +339,5 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   shipIDMouseDown(event: any) {
     this.selectedShipNameWithIndex = event.target.id;
   }
-
 
 }
