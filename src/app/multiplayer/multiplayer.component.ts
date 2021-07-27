@@ -67,23 +67,7 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.startMultiPlayer();
-    this.timedOut();
-  }
-
-  rotateShips() {
-    this.isHorizontal = !this.isHorizontal;
-  }
-
-  startGame() {
-    this.playGameMulti();
-    this.isGameStarted = !this.isGameStarted;
-
-  }
-
-  
-  startMultiPlayer() {
-    //Step 1 Setup the connection and request for a Player Number. In socketIO Service
+     //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
     // Step 2 Receive the player number
     this.playerNumberReceived();
@@ -95,6 +79,27 @@ export class MultiplayerComponent implements OnInit {
     this. checkPlayersReceiver(); 
     //step 6 timeout Check Limit 
     this.timedOut(); 
+    //Step 8 
+    this.fireReceived();
+    //Step 9 
+    this.fireRelyReceived();  
+    
+  }
+
+  rotateShips() {
+    this.isHorizontal = !this.isHorizontal;
+  }
+
+  startGame() {
+    this.startMultiPlayer();
+    this.playGameMulti();
+    this.isGameStarted = !this.isGameStarted;
+
+  }
+
+  
+  startMultiPlayer() {
+   
 
     // step 7- Setup listen for shots fired
     console.log(this.currentPlayer, 'current player');
@@ -111,10 +116,7 @@ export class MultiplayerComponent implements OnInit {
       })
     })
 
-    //Step 8 
-    this.fireReceived();
-    //Step 9 
-    this.fireRelyReceived();    
+      
   }
 
   //Step 2
