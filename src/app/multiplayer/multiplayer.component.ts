@@ -97,11 +97,14 @@ export class MultiplayerComponent implements OnInit {
     this.timedOut(); 
 
     // step 7- Setup listen for shots fired
+    console.log(this.currentPlayer, 'current player');
+    console.log(this.ready, 'this.ready')
+    console.log(this.enemyReady, 'enemyReady'); 
     this.computerSquares.forEach((square: any) => {
       square.addEventListener('click', () => {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
-          console.log(this.shotFired);
+          console.log(this.shotFired,'shotFIRED');
           //step 7-A
           this.socketIO.shotFiredEmit(this.shotFired);
         }
@@ -409,11 +412,3 @@ export class MultiplayerComponent implements OnInit {
 
 
 }
-function playerConnectedOrDisconnected(i: any) {
-  throw new Error('Function not implemented.');
-}
-
-function player(player: any) {
-  throw new Error('Function not implemented.');
-}
-
