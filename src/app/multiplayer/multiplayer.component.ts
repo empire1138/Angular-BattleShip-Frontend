@@ -32,7 +32,7 @@ export class MultiplayerComponent implements OnInit {
   allShipsPlaced: boolean = false
   shotFired: number = -1
   gameMode: string = 'multiPlayer'
-  infoMessageDisplay: string = 'Place the ships on the game grid then click Start Game';
+  infoMessageDisplay: string = '';
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -67,6 +67,7 @@ export class MultiplayerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.infoMessageDisplay="Place the ships on the game grid then click Start Game"
      //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
     // Step 2 Receive the player number
@@ -94,14 +95,13 @@ export class MultiplayerComponent implements OnInit {
     this.startMultiPlayer();
     this.playGameMulti();
     this.isGameStarted = !this.isGameStarted;
-
+    this.infoMessageDisplay = '';
   }
 
   
   startMultiPlayer() {
    
 
-    // step 7- Setup listen for shots fired
     console.log(this.currentPlayer, 'current player');
     console.log(this.ready, 'this.ready')
     console.log(this.enemyReady, 'enemyReady'); 
