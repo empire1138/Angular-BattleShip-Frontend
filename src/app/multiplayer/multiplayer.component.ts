@@ -214,10 +214,10 @@ export class MultiplayerComponent implements OnInit {
     }
     if (this.enemyReady) {
       if (this.currentPlayer === 'user') {
-        this.infoMessageDisplay = 'Your Go'
+       //this.infoMessageDisplay = 'Your Go'
       }
       if (this.currentPlayer === 'enemy') {
-        this.infoMessageDisplay = "Enemy's Go"
+        //this.infoMessageDisplay = "Enemy's Go"
       }
     }
   }
@@ -271,11 +271,18 @@ export class MultiplayerComponent implements OnInit {
       this.checkForWins()
     } else if (this.gameMode === 'singlePlayer') this.enemyGo()
     this.currentPlayer = 'user'
-    this.infoMessageDisplay = 'Your Go'
+    //this.infoMessageDisplay = 'Your Go'
+    // console.log(this.cpuDestroyerCount, 'cpuDestroyerCount')
+    // console.log(this.cpuSubmarineCount, 'cpuSubCount')
+    // console.log(this.cpuCruiserCount, 'cpuCruiserCount')
+    // console.log(this.cpuBattleshipCount, 'cpuBattleCount')
+    // console.log(this.cpuCarrierCount, 'cpuCarrierCount')
+    console.log(this.infoMessageDisplay, 'infoMessageDisplay')
   }
 
 
   checkForWins() {
+    console.log(this.infoMessageDisplay, 'infoMessageDisplay')
     let enemy = 'computer'
     if (this.gameMode === 'multiPlayer') enemy = 'enemy'
     if (this.destroyerCount === 2) {
