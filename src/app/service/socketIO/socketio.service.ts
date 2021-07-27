@@ -16,7 +16,6 @@ export class SocketioService {
   setupSocketConnection() {
     this.socket = io('http://localhost:3000');
     this.socket.emit('player-number')
-    console.log('fired');
   }
   getPlayerNumber(): Observable<any> {
     return new Observable((observer) => {
