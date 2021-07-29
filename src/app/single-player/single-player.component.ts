@@ -17,6 +17,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   //@ViewChild("destroyerContainer") destroyerContainer!: ElementRef; 
 
   width = 10;
+  height = 10;
   userSquares: any = []
   computerSquares: any = []
   isHorizontal: boolean = true;
@@ -237,26 +238,26 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDragStart(event: any) {
     this.draggedShip = event.target
     this.draggedShipLength = this.draggedShip.childNodes.length;
-    console.log(this.draggedShip, 'draggedShip')
-    console.log(this.draggedShipLength, 'draggedShipLength');
+   // console.log(this.draggedShip, 'draggedShip')
+    //console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
-    console.log('dragging', event);
+    //console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
-    console.log('drag over', event);
-    console.log(event.target)
+    //console.log('drag over', event);
+    //console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
-    console.log('drag end', event);
+    //console.log('drag end', event);
 
   }
   onDragLeave(event: DragEvent) {
-    console.log('drag leave', event);
+    //console.log('drag leave', event);
   }
   isSquareTaken() {
     this.userSquares.array.forEach((squares: any) => {
@@ -280,6 +281,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
+    let shipLastIdVert =  parseInt(event.target.dataset.id) + (10 * lastShipIndex);
+    console.log(shipLastIdVert, "vertical ship last id")
+
     console.log(shipLastId, 'shipLastId');
 
 
@@ -289,13 +293,35 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
+
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-    console.log(shipLastId, 'SecondShipLastID')
-    console.log(selectedShipIndex, 'selectedShipIndex');
-    shipLastId = shipLastId - selectedShipIndex
-    console.log(shipLastId, 'ThirdShipLastID');
+   
+    let vertSelectedShipIndex = selectedShipIndex
+    let vertShipLastId
+    
 
+    if(this.isHorizontal === true){
+      
+      console.log(shipLastId, 'SecondShipLastID')
+      console.log(selectedShipIndex, 'selectedShipIndex');
+      shipLastId = shipLastId - selectedShipIndex
+      console.log(shipLastId, 'ThirdShipLastID');
+  }else if(this.isHorizontal === false){
+    vertSelectedShipIndex = 0
+    vertShipLastId = this.draggedShipLength - selectedShipIndex
+ 
+  
+      for(let i = 0;i < this.draggedShipLength - 1; i++){
+        shipLastIdVert = shipLastIdVert - 10
+        console.log(shipLastIdVert, 'ship last id vert')
+      }
+      
 
+     
+
+  }
+
+let startVertIndex = parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
 
     if (this.isHorizontal === true && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
@@ -311,9 +337,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     } else if (this.isHorizontal === false && !newNotAllowedVertical.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
+        
+        
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
+        startVertIndex +=10; 
+        console.log(startVertIndex, "startvertindex")
 
       }
     } else return
@@ -322,7 +352,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
     // takenSquares = this.userSquares.classes.contains("taken")
     //console.log(takenSquares, "taken squares")
-    this.isSquareTaken()
+    // this.isSquareTaken()
 
   }
 
