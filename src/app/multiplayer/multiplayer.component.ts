@@ -421,6 +421,6 @@ export class MultiplayerComponent implements OnInit {
   shipIDMouseDown(event: any) {
     this.selectedShipNameWithIndex = event.target.id;
   }
-
+  
 
 }

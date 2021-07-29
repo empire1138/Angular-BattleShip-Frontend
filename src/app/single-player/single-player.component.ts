@@ -240,28 +240,31 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   onDrag(event: DragEvent) {
-    console.log('dragging', event);
+   // console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
-    console.log('drag over', event);
-    console.log(event.target)
+    //console.log('drag over', event);
+   // console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
-    console.log('drag end', event);
+    //console.log('drag end', event);
 
   }
   onDragLeave(event: DragEvent) {
-    console.log('drag leave', event);
+   // console.log('drag leave', event);
   }
 
   onDrop(event: any) {
-    console.log(event.target.dataset.id, 'dataset.id')
+    //console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
+    console.log(shipNameWithLastID, 'shipNameWithLastID')
     let shipClass = shipNameWithLastID.slice(0, -2);
+    console.log(shipClass, 'ShipClass')
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
+    console.log(lastShipIndex, 'LastShipIndex'); 
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
     console.log(shipLastId, 'shipLastId');
 
@@ -272,9 +275,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
+    console.log(selectedShipIndex, 'SelectedShipIndex')
     console.log(shipLastId, 'SecondShipLastID')
     console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
+    //let vertShipLastId = 
     console.log(shipLastId, 'ThirdShipLastID');
 
 
@@ -303,7 +308,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   onDragEnter(event: any) {
     event.preventDefault();
-    console.log('drag enter', event);
+    //console.log('drag enter', event);
 
   }
   shipIDMouseDown(event: any) {
