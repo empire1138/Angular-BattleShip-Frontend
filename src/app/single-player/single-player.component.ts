@@ -267,7 +267,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(lastShipIndex, 'LastShipIndex'); 
     console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    let shipLastIdVert =  parseInt(event.target.dataset.id) + (10 * lastShipIndex);
+    let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
     console.log(shipLastIdVert, 'shipLastIdVert')
     console.log(shipLastId, 'shipLastId');
 
@@ -282,6 +282,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(shipLastId, 'SecondShipLastID')
     console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
+    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex; 
+    console.log(shipLastIdVert2, 'shipLastIDVert2');  
     //let vertShipLastId = 
     console.log(shipLastId, 'ThirdShipLastID');
 
