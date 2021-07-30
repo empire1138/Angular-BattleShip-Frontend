@@ -321,7 +321,15 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
 
-let startVertIndex = parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
+let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
+if((lastShipIndex-selectedShipIndex) === 0){
+  startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+}
+if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+  startVertIndex = parseInt(event.target.dataset.id)
+}
+
+//parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
 
     if (this.isHorizontal === true && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
