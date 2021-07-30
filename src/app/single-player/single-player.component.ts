@@ -265,7 +265,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(shipClass, 'ShipClass')
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     console.log(lastShipIndex, 'LastShipIndex'); 
+    console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
+    let shipLastIdVert =  parseInt(event.target.dataset.id) + (10 * lastShipIndex);
+    console.log(shipLastIdVert, 'shipLastIdVert')
     console.log(shipLastId, 'shipLastId');
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
