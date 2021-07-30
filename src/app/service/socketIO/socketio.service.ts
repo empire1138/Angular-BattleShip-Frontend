@@ -14,7 +14,7 @@ export class SocketioService {
   }
   //Step 1
   setupSocketConnection() {
-    this.socket = io('http://localhost:3000');
+    this.socket = io('http://localhost:3309');
     this.socket.emit('player-number')
   }
   //Step 2-A 
