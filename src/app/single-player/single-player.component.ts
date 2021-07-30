@@ -314,6 +314,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         console.log(startVertIndex, 'startVertIndex')
         this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
         startVertIndex +=10; 
+        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
+        console.log(takenBlock, 'takenBlock')
         // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
