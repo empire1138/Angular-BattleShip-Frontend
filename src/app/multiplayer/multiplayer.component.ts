@@ -389,6 +389,16 @@ export class MultiplayerComponent implements OnInit {
     shipLastId = shipLastId - selectedShipIndex
     //console.log(shipLastId, 'ThirdShipLastID');
 
+     // vert bug start  trying to get the vert bug just right 
+    //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
+    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
+    if((lastShipIndex-selectedShipIndex) === 0){
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    }
+    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+      startVertIndex = parseInt(event.target.dataset.id)
+    }
+    // vert bug end
 
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
@@ -404,7 +414,9 @@ export class MultiplayerComponent implements OnInit {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
+        startVertIndex +=10; 
+        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
 

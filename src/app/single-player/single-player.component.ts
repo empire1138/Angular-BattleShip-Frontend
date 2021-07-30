@@ -287,7 +287,16 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     //let vertShipLastId = 
     console.log(shipLastId, 'ThirdShipLastID');
 
-
+    // vert bug start  trying to get the vert bug just right 
+    //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
+    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
+    if((lastShipIndex-selectedShipIndex) === 0){
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    }
+    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+      startVertIndex = parseInt(event.target.dataset.id)
+    }
+    // vert bug end
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
@@ -297,12 +306,15 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)].classList.add('taken', 'vertical', directionClass, shipClass)
+        console.log(startVertIndex, 'startVertIndex')
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
+        startVertIndex +=10; 
+        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
 
