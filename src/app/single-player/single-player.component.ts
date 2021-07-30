@@ -243,13 +243,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   onDrag(event: DragEvent) {
-    //console.log('dragging', event);
+   // console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
     //console.log('drag over', event);
-    //console.log(event.target)
+   // console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
@@ -257,33 +257,30 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
   onDragLeave(event: DragEvent) {
-    //console.log('drag leave', event);
+   // console.log('drag leave', event);
   }
-  isSquareTaken() {
-    this.userSquares.array.forEach((squares: any) => {
-      squares.contains('taken', () => {
-        console.log(squares.contains, "taken squares")
-        this.takenSquares = squares.dataset.id;
-        console.log(squares.dataset.id, "taken squares");
-      });
-    })
-  }
+  // isSquareTaken() {
+  //   this.userSquares.array.forEach((squares: any) => {
+  //     squares.contains('taken', () => {
+  //       console.log(squares.contains, "taken squares")
+  //       this.takenSquares = squares.dataset.id;
+  //       console.log(squares.dataset.id, "taken squares");
+  //     });
+  //   })
+  // }
 
   onDrop(event: any) {
-
-    let current: any = event.target.dataset.id
-    //const userTaken =  current.some((index: any) => this.userSquares[event?.target.dataset.id].classList.contains('taken'))
-    // let takenSquares:any
-    console.log(current, "current")
-
-    console.log(event.target.dataset.id, 'dataset.id')
+    //console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
+    console.log(shipNameWithLastID, 'shipNameWithLastID')
     let shipClass = shipNameWithLastID.slice(0, -2);
+    console.log(shipClass, 'ShipClass')
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
+    console.log(lastShipIndex, 'LastShipIndex'); 
+    console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    let shipLastIdVert =  parseInt(event.target.dataset.id) + (10 * lastShipIndex);
-    console.log(shipLastIdVert, "vertical ship last id")
-
+    let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
+    console.log(shipLastIdVert, 'shipLastIdVert')
     console.log(shipLastId, 'shipLastId');
 
 
@@ -295,43 +292,26 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-   
-    let vertSelectedShipIndex = selectedShipIndex
-    let vertShipLastId
-    
+    console.log(selectedShipIndex, 'SelectedShipIndex')
+    console.log(shipLastId, 'SecondShipLastID')
+    console.log(selectedShipIndex, 'selectedShipIndex');
+    shipLastId = shipLastId - selectedShipIndex
+    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex; 
+    console.log(shipLastIdVert2, 'shipLastIDVert2');  
+    //let vertShipLastId = 
+    console.log(shipLastId, 'ThirdShipLastID');
 
-    if(this.isHorizontal === true){
-      
-      console.log(shipLastId, 'SecondShipLastID')
-      console.log(selectedShipIndex, 'selectedShipIndex');
-      shipLastId = shipLastId - selectedShipIndex
-      console.log(shipLastId, 'ThirdShipLastID');
-  }else if(this.isHorizontal === false){
-    vertSelectedShipIndex = 0
-    vertShipLastId = this.draggedShipLength - selectedShipIndex
- 
-  
-      for(let i = 0;i < this.draggedShipLength - 1; i++){
-        shipLastIdVert = shipLastIdVert - 10
-        console.log(shipLastIdVert, 'ship last id vert')
-      }
-      
-
-     
-
-  }
-
-let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
-if((lastShipIndex-selectedShipIndex) === 0){
-  startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
-}
-if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
-  startVertIndex = parseInt(event.target.dataset.id)
-}
-
-//parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
-
-    if (this.isHorizontal === true && !newNotAllowedHorizontal.includes(shipLastId)) {
+    // vert bug start  trying to get the vert bug just right 
+    //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
+    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
+    if((lastShipIndex-selectedShipIndex) === 0){
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    }
+    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+      startVertIndex = parseInt(event.target.dataset.id)
+    }
+    // vert bug end
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -342,17 +322,19 @@ if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (this.isHorizontal === false && !newNotAllowedVertical.includes(shipLastId)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         
         
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
+        console.log(startVertIndex, 'startVertIndex')
         this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
         startVertIndex +=10; 
-        console.log(startVertIndex, "startvertindex")
-
+        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
+        console.log(takenBlock, 'takenBlock')
+        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
 
@@ -360,14 +342,14 @@ if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
     // takenSquares = this.userSquares.classes.contains("taken")
     //console.log(takenSquares, "taken squares")
-    // this.isSquareTaken()
+    //this.isSquareTaken()
 
   }
 
 
   onDragEnter(event: any) {
     event.preventDefault();
-    console.log('drag enter', event);
+    //console.log('drag enter', event);
 
   }
   shipIDMouseDown(event: any) {
