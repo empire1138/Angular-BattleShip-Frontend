@@ -17,6 +17,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   //@ViewChild("destroyerContainer") destroyerContainer!: ElementRef; 
 
   width = 10;
+  height = 10;
   userSquares: any = []
   computerSquares: any = []
   isHorizontal: boolean = true;
@@ -237,8 +238,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDragStart(event: any) {
     this.draggedShip = event.target
     this.draggedShipLength = this.draggedShip.childNodes.length;
-    console.log(this.draggedShip, 'draggedShip')
-    console.log(this.draggedShipLength, 'draggedShipLength');
+   // console.log(this.draggedShip, 'draggedShip')
+    //console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
@@ -289,6 +290,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
+
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
     console.log(selectedShipIndex, 'SelectedShipIndex')
     console.log(shipLastId, 'SecondShipLastID')
@@ -321,7 +323,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
-        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
+        
+        
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         console.log(startVertIndex, 'startVertIndex')
@@ -329,7 +332,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
         startVertIndex +=10; 
         
-        console.log(takenBlock, 'takenBlock')
+       // console.log(takenBlock, 'takenBlock')
         // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
