@@ -315,20 +315,20 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
-
-
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
     } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
+        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         console.log(startVertIndex, 'startVertIndex')
+        //if (!takenBlock) break; 
         this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
         startVertIndex +=10; 
-        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
+        
         console.log(takenBlock, 'takenBlock')
         // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
