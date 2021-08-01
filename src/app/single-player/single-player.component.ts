@@ -238,18 +238,18 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDragStart(event: any) {
     this.draggedShip = event.target
     this.draggedShipLength = this.draggedShip.childNodes.length;
-   // console.log(this.draggedShip, 'draggedShip')
+    // console.log(this.draggedShip, 'draggedShip')
     //console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
-   // console.log('dragging', event);
+    // console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
     //console.log('drag over', event);
-   // console.log(event.target)
+    // console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
@@ -257,13 +257,15 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
   onDragLeave(event: DragEvent) {
-   // console.log('drag leave', event);
+    // console.log('drag leave', event);
   }
 
   onDrop(event: any) {
     let shipNameWithLastID = this.draggedShip.lastChild.id;
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
+    console.log(lastShipIndex, 'LastShipIndex');
+    console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
     let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
 
@@ -275,24 +277,23 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
     shipLastId = shipLastId - selectedShipIndex
-    
-   
-  
+    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex;
+    console.log(shipLastIdVert2, 'shipLastIDVert2');
+    //let vertShipLastId = 
+    console.log(shipLastId, 'ThirdShipLastID');
 
     // vert bug start  trying to get the vert bug just right 
-    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
-    if((lastShipIndex-selectedShipIndex) === 0){
-      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
+    let startVertIndex = parseInt(event.target.dataset.id) - (selectedShipIndex * 10)
+    if ((lastShipIndex - selectedShipIndex) === 0) {
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10);
     }
-    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+    if (lastShipIndex === (lastShipIndex - selectedShipIndex)) {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
-    //These are the overwrite checks for the ships 
-    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken'); 
-    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken')
-
-    console.log(startIndexHertCheck, 'StatIndexHert'); 
+    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
@@ -305,8 +306,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass); 
-        startVertIndex +=10; 
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass);
+        startVertIndex += 10;
       }
     } else return
 
