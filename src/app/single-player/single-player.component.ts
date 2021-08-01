@@ -297,7 +297,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
+    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken'); 
+    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken')
+    console.log(startIndexHertCheck, 'StatIndexHert'); 
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -306,17 +309,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        console.log(startVertIndex, 'startVertIndex')
-        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass); 
         startVertIndex +=10; 
-        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
-        console.log(takenBlock, 'takenBlock')
-        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
       }
     } else return
 
