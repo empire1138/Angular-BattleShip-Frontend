@@ -102,6 +102,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (this.currentPlayer === 'user') {
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
         this.shotFired = square.dataset.id
+        console.log(this.shotFired, 'this.shotFired')
         this.revealSquare(square.classList)
       }))
     }
@@ -112,6 +113,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     }
   }
   revealSquare(classList: any) {
+    let firedShotsArray: any[] = []
+    firedShotsArray.push(classList); 
+    console.log(firedShotsArray, 'firedshotsArray')
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
     const obj = Object.values(classList)
     if (!enemySquare.classList.contains('boom') && this.currentPlayer === 'user' && !this.isGameOver) {
