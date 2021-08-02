@@ -35,6 +35,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   takenSquares: any = []
   gameMode: string = 'singlePlayer'
   infoMessageDisplay: string = '';
+  firedShotsArray: number[] = []
+  returnHitMissCheck: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -105,8 +107,15 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (this.currentPlayer === 'user') {
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
         this.shotFired = square.dataset.id
-        this.revealSquare(square.classList)
+        console.log(this.shotFired, 'this.shotFired')
+        this.hitMissCheck(this.shotFired);
+        //Checks on the hit or miss is not duplicated 
+        if (!this.returnHitMissCheck) {
+          this.revealSquare(square.classList)
+        }
+        this.returnHitMissCheck = false; 
       }))
+     
     }
     if (this.currentPlayer === 'enemy') {
       setTimeout(() => {
@@ -114,7 +123,29 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }, 1000);
     }
   }
+  hitMissCheck(clickedSquare: number) {
+    let foundHitMissCheck: number = 0;
+
+    this.firedShotsArray.push(clickedSquare);
+    console.log(this.firedShotsArray, 'firedshotsArray')
+    //Goes though the array of fired shots and checks for duplicates. When it finds the duplicates prints the copy
+    for (let i = 0; i < this.firedShotsArray.length; i++) {
+
+      if (this.firedShotsArray.indexOf(this.firedShotsArray[i]) !== this.firedShotsArray.lastIndexOf(this.firedShotsArray[i])) {
+        foundHitMissCheck = this.firedShotsArray[i];
+        this.returnHitMissCheck = true
+        console.log(foundHitMissCheck, 'foundHitMissCheck');
+      }
+    }
+    //this removes the duplicate from the array 
+    this.firedShotsArray = this.firedShotsArray.filter((item, index) => {
+      return this.firedShotsArray.indexOf(item) === index;
+    })
+  }
+
+
   revealSquare(classList: any) {
+
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
     const obj = Object.values(classList)
     if (!enemySquare.classList.contains('boom') && this.currentPlayer === 'user' && !this.isGameOver) {
