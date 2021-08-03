@@ -87,12 +87,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.isHorizontal = !this.isHorizontal;
   }
 
-  startGame() {
-    this.generateComputerShips(this.shipArray[0]);
-    this.generateComputerShips(this.shipArray[1]);
-    this.generateComputerShips(this.shipArray[2]);
-    this.generateComputerShips(this.shipArray[3]);
-    this.generateComputerShips(this.shipArray[4]);
+  async startGame() {
+    await this.generateComputerShips(this.shipArray[0]);
+    await this.generateComputerShips(this.shipArray[1]);
+    await this.generateComputerShips(this.shipArray[2]);
+    await this.generateComputerShips(this.shipArray[3]);
+    await this.generateComputerShips(this.shipArray[4]);
 
     this.playGameSinglePlayer();
     this.isGameStarted = !this.isGameStarted;
@@ -110,9 +110,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (!this.returnHitMissCheck) {
           this.revealSquare(square.classList)
         }
-        this.returnHitMissCheck = false; 
+        this.returnHitMissCheck = false;
       }))
-     
+
     }
     if (this.currentPlayer === 'enemy') {
       setTimeout(() => {
@@ -239,6 +239,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   generateComputerShips(ship: any) {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
+    let isTaken: boolean = false;
     console.log(current, 'current');
     let direction: number = 0;
 
@@ -250,7 +251,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
 
-    const isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    console.log(randomStart, 'randomStart');
+
+    isTaken = current.some((index: number) => this.computerSquares[randomStart + index].classList.contains('taken'))
     console.log(isTaken, 'isTaken');
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
@@ -294,7 +297,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-   
+
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
 
@@ -303,7 +306,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
     shipLastId = shipLastId - selectedShipIndex
- 
+
     // vert bug start  trying to get the vert bug just right 
     //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
     let startVertIndex = parseInt(event.target.dataset.id) - (selectedShipIndex * 10)
@@ -316,6 +319,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     // vert bug end
     let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
     let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+    console.log(startIndexHertCheck, 'startIndexHertCheck');
+    console.log(startIndexVertCheck, 'startVertCheck');
+
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass

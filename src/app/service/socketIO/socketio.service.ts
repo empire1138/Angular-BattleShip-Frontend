@@ -26,6 +26,12 @@ export class SocketioService {
       })
     })
   }
+  getRoomEmit(){
+    
+  }
+  getRoomReceived(){
+    
+  }
   //Step 2-B
   checkPlayersEmit() {
     this.socket.emit('check-players');
