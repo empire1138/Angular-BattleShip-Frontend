@@ -35,6 +35,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   takenSquares: any = []
   gameMode: string = 'singlePlayer'
   infoMessageDisplay: string = '';
+  firedShotsArray: number[] = []
+  returnHitMissCheck: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -106,8 +108,15 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
         //if (this.computerSquares[square.dataset.id].classList.contains('miss'))
         this.shotFired = square.dataset.id
-        this.revealSquare(square.classList)
+        console.log(this.shotFired, 'this.shotFired')
+        this.hitMissCheck(this.shotFired);
+        //Checks on the hit or miss is not duplicated 
+        if (!this.returnHitMissCheck) {
+          this.revealSquare(square.classList)
+        }
+        this.returnHitMissCheck = false; 
       }))
+     
     }
     if (this.currentPlayer === 'enemy') {
       setTimeout(() => {
@@ -115,7 +124,29 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }, 1000);
     }
   }
+  hitMissCheck(clickedSquare: number) {
+    let foundHitMissCheck: number = 0;
+
+    this.firedShotsArray.push(clickedSquare);
+    console.log(this.firedShotsArray, 'firedshotsArray')
+    //Goes though the array of fired shots and checks for duplicates. When it finds the duplicates prints the copy
+    for (let i = 0; i < this.firedShotsArray.length; i++) {
+
+      if (this.firedShotsArray.indexOf(this.firedShotsArray[i]) !== this.firedShotsArray.lastIndexOf(this.firedShotsArray[i])) {
+        foundHitMissCheck = this.firedShotsArray[i];
+        this.returnHitMissCheck = true
+        console.log(foundHitMissCheck, 'foundHitMissCheck');
+      }
+    }
+    //this removes the duplicate from the array 
+    this.firedShotsArray = this.firedShotsArray.filter((item, index) => {
+      return this.firedShotsArray.indexOf(item) === index;
+    })
+  }
+
+
   revealSquare(classList: any) {
+
     const enemySquare = this.computerGrid.nativeElement.querySelector(`div[data-id='${this.shotFired}']`)
     const obj = Object.values(classList)
     if (!enemySquare.classList.contains('boom') && this.currentPlayer === 'user' && !this.isGameOver) {
@@ -239,18 +270,18 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDragStart(event: any) {
     this.draggedShip = event.target
     this.draggedShipLength = this.draggedShip.childNodes.length;
-   // console.log(this.draggedShip, 'draggedShip')
+    // console.log(this.draggedShip, 'draggedShip')
     //console.log(this.draggedShipLength, 'draggedShipLength');
   }
 
   onDrag(event: DragEvent) {
-   // console.log('dragging', event);
+    // console.log('dragging', event);
   }
 
   onDragOver(event: any) {
     event.preventDefault();
     //console.log('drag over', event);
-   // console.log(event.target)
+    // console.log(event.target)
   }
 
   onDragEnd(event: DragEvent) {
@@ -258,32 +289,17 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
   onDragLeave(event: DragEvent) {
-   // console.log('drag leave', event);
+    // console.log('drag leave', event);
   }
-  // isSquareTaken() {
-  //   this.userSquares.array.forEach((squares: any) => {
-  //     squares.contains('taken', () => {
-  //       console.log(squares.contains, "taken squares")
-  //       this.takenSquares = squares.dataset.id;
-  //       console.log(squares.dataset.id, "taken squares");
-  //     });
-  //   })
-  // }
 
   onDrop(event: any) {
-    //console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
-    console.log(shipNameWithLastID, 'shipNameWithLastID')
     let shipClass = shipNameWithLastID.slice(0, -2);
-    console.log(shipClass, 'ShipClass')
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
-    console.log(lastShipIndex, 'LastShipIndex'); 
+    console.log(lastShipIndex, 'LastShipIndex');
     console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
     let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
-    console.log(shipLastIdVert, 'shipLastIdVert')
-    console.log(shipLastId, 'shipLastId');
-
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
@@ -291,60 +307,44 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
-
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-    console.log(selectedShipIndex, 'SelectedShipIndex')
-    console.log(shipLastId, 'SecondShipLastID')
-    console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
-    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex; 
-    console.log(shipLastIdVert2, 'shipLastIDVert2');  
+    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex;
+    console.log(shipLastIdVert2, 'shipLastIDVert2');
     //let vertShipLastId = 
     console.log(shipLastId, 'ThirdShipLastID');
 
     // vert bug start  trying to get the vert bug just right 
     //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
-    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
-    if((lastShipIndex-selectedShipIndex) === 0){
-      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    let startVertIndex = parseInt(event.target.dataset.id) - (selectedShipIndex * 10)
+    if ((lastShipIndex - selectedShipIndex) === 0) {
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10);
     }
-    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+    if (lastShipIndex === (lastShipIndex - selectedShipIndex)) {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
+    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
-
-
       }
-      //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
-      //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !startIndexHertCheck && !startIndexVertCheck) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
-        
-        
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        console.log(startVertIndex, 'startVertIndex')
-        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
-        startVertIndex +=10; 
-        let takenBlock = this.userSquares[startVertIndex].classList.contains('taken'); 
-        console.log(takenBlock, 'takenBlock')
-        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass);
+        startVertIndex += 10;
       }
     } else return
 
     this.displayGrid.nativeElement.removeChild(this.draggedShip)
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
-    // takenSquares = this.userSquares.classes.contains("taken")
-    //console.log(takenSquares, "taken squares")
-    //this.isSquareTaken()
-
   }
 
 
