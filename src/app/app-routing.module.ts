@@ -6,11 +6,15 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { SinglePlayerComponent } from './single-player/single-player.component';
 import { MultiplayerComponent } from './multiplayer/multiplayer.component';
 import { GameEndingComponent } from './game-ending/game-ending.component';
+import { MultiplayerGameLobbyComponent } from './multiplayer-game-lobby/multiplayer-game-lobby.component';
+import { MultiplayerGameByCodeComponent } from './multiplayer-game-by-code/multiplayer-game-by-code.component';
 
 const routes: Routes = [
   { path: '', component: StartPageComponent },
   { path: 'single-player', component: SinglePlayerComponent },
   { path: 'multiplayer', component: MultiplayerComponent},
+  { path: 'multiplayer-GameLobby', component: MultiplayerGameLobbyComponent},
+  { path: 'multiplayer-GameByCode/:id' , component: MultiplayerGameByCodeComponent}, 
   { path: 'game-ending', component: GameEndingComponent},
   { path: '**', component: PageNotFoundComponent},
 ];

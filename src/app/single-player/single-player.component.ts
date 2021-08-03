@@ -291,17 +291,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   onDrop(event: any) {
     //console.log(event.target.dataset.id, 'dataset.id')
     let shipNameWithLastID = this.draggedShip.lastChild.id;
-    console.log(shipNameWithLastID, 'shipNameWithLastID')
     let shipClass = shipNameWithLastID.slice(0, -2);
-    console.log(shipClass, 'ShipClass')
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
-    console.log(lastShipIndex, 'LastShipIndex');
-    console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
-    console.log(shipLastIdVert, 'shipLastIdVert')
-    console.log(shipLastId, 'shipLastId');
-
+   
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
 
@@ -309,15 +302,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-    console.log(selectedShipIndex, 'SelectedShipIndex')
-    console.log(shipLastId, 'SecondShipLastID')
-    console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
-    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex;
-    console.log(shipLastIdVert2, 'shipLastIDVert2');
-    //let vertShipLastId = 
-    console.log(shipLastId, 'ThirdShipLastID');
-
+ 
     // vert bug start  trying to get the vert bug just right 
     //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
     let startVertIndex = parseInt(event.target.dataset.id) - (selectedShipIndex * 10)

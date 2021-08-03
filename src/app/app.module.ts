@@ -13,6 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MultiplayerGameLobbyComponent } from './multiplayer-game-lobby/multiplayer-game-lobby.component';
+import { MultiplayerGameByCodeComponent } from './multiplayer-game-by-code/multiplayer-game-by-code.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     PageNotFoundComponent,
     SinglePlayerComponent,
     MultiplayerComponent,
-    GameEndingComponent
+    GameEndingComponent,
+    MultiplayerGameLobbyComponent,
+    MultiplayerGameByCodeComponent
   ],
   imports: [
     BrowserModule,
