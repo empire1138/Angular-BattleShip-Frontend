@@ -104,6 +104,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (this.isGameOver) return
     if (this.currentPlayer === 'user') {
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
+        //if (this.computerSquares[square.dataset.id].classList.contains('miss'))
         this.shotFired = square.dataset.id
         this.revealSquare(square.classList)
       }))
