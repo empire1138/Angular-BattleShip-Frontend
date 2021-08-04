@@ -317,17 +317,22 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
-    let checkHertArray = [] ; 
-    let checkVertCheck: number[] = []; 
-    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
-    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
 
-   
-    
-    console.log(startIndexHertCheck, 'startIndexHertCheck');
-    console.log(startIndexVertCheck, 'startVertCheck');
-
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
+    //Start of the ship drop overwrite check.  
+    let checkHertArray: boolean[] = [];
+    let checkVertArray: boolean[] = [];
+    let forLoopStartVertIndex = startVertIndex; 
+    //this will be an array of true or false for the check condition 
+    for (let i = 0; i < this.draggedShipLength; i++) {
+      checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+      checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+      forLoopStartVertIndex += 10; 
+    }
+    // Will check the array for "every" boolean in the array and return one true or false 
+    let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
+   // End of the ship drop overwrite Check 
+  
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -336,7 +341,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !startIndexHertCheck && !startIndexVertCheck) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
