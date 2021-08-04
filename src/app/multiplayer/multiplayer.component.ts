@@ -35,6 +35,7 @@ export class MultiplayerComponent implements OnInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
+  currentGameRoomNumber: number = 0; 
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -72,6 +73,8 @@ export class MultiplayerComponent implements OnInit {
     this.infoMessageDisplay = "Place the ships on the game grid then click Start Game"
     //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
+    // Get Room Number 
+    this.getRoomNumber(); 
     // Step 2 Receive the player number
     this.playerNumberReceived();
     // Step 3 Another player has connected or disconnected
@@ -143,7 +146,12 @@ export class MultiplayerComponent implements OnInit {
       return this.firedShotsArray.indexOf(item) === index;
     })
   }
-
+  //New Step Get Room Number 
+  getRoomNumber(){
+    this.socketIO.getRoomReceived().subscribe((number: any) => {
+      this.currentGameRoomNumber = number; 
+    })
+  }
 
   //Step 2
   playerNumberReceived() {
