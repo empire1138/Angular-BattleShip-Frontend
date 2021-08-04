@@ -317,8 +317,13 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
+    let checkHertArray = [] ; 
+    let checkVertCheck: number[] = []; 
     let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
     let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+
+   
+    
     console.log(startIndexHertCheck, 'startIndexHertCheck');
     console.log(startIndexVertCheck, 'startVertCheck');
 
