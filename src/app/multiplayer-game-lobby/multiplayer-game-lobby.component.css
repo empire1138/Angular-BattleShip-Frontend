@@ -1,0 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=Bungee&display=swap");
+
+body {
+  margin: 0;
+  background-color: #f3f3f3;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  font-family: "Montserrat", sans-serif;
+  box-sizing: border-box;
+}
+
+.display-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-image: url("/assets/large-clip-art-battleship.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+}
+
+.game-title {
+  font-size: 50px;
+  font-weight: bold;
+  line-height: 1em;
+  margin-bottom: 200px;
+  font-family: "Bungee", cursive;
+  color: rgb(148, 148, 148);
+
+  /* Create 3D effect by stacking shadows. */
+  text-shadow: 0px 0px 0 rgb(107, 107, 107), 1px 1px 0 rgb(74, 74, 74),
+    2px 2px 0 rgb(41, 41, 41), 3px 3px 0 rgb(8, 8, 8),
+    4px 4px 3px rgba(0, 0, 0, 0.4), 4px 4px 1px rgba(0, 0, 0, 0.5),
+    0px 0px 3px rgba(0, 0, 0, 0.2);
+}
+
+.btn {
+  font-size: inherit;
+  background-color: hsl(30, 100%, 50%);
+  padding: 0.5em 1em;
+  outline: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 0.2em;
+  color: #333;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: hsl(30, 100%, 40%);
+}
+
+.splash-btn {
+  font-size: 2rem;
+  margin-left: 2rem;
+}
+
+.splash-btn:first-child {
+  margin-left: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
