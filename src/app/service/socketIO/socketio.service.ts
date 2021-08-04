@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { ObserversModule } from '@angular/cdk/observers';
+import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
@@ -14,7 +15,7 @@ export class SocketioService {
   }
   //Step 1
   setupSocketConnection() {
-    this.socket = io('http://localhost:3309');
+    this.socket = io(environment.SOCKET_ENDPOINT);
     this.socket.emit('player-number')
   }
   //Step 2-A 
@@ -26,11 +27,14 @@ export class SocketioService {
       })
     })
   }
-  getRoomEmit(){
-    
-  }
+  // New Step Will add Number later. this gets the room number for current game
   getRoomReceived(){
-    
+    return new Observable((observer) => {
+      this.socket.on('room-number', (roomNum: number) => {
+        console.log(roomNum)
+        observer.next(roomNum); 
+      })
+    } )
   }
   //Step 2-B
   checkPlayersEmit() {
