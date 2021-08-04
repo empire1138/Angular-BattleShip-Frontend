@@ -90,12 +90,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.isHorizontal = !this.isHorizontal;
   }
 
-  async startGame() {
-    await this.generateComputerShips(this.shipArray[0]);
-    await this.generateComputerShips(this.shipArray[1]);
-    await this.generateComputerShips(this.shipArray[2]);
-    await this.generateComputerShips(this.shipArray[3]);
-    await this.generateComputerShips(this.shipArray[4]);
+  startGame() {
+    this.generateComputerShips(this.shipArray[0]);
+    this.generateComputerShips(this.shipArray[1]);
+    this.generateComputerShips(this.shipArray[2]);
+    this.generateComputerShips(this.shipArray[3]);
+    this.generateComputerShips(this.shipArray[4]);
 
     this.playGameSinglePlayer();
     this.isGameStarted = !this.isGameStarted;
@@ -323,17 +323,17 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     //Start of the ship drop overwrite check.  
     let checkHertArray: boolean[] = [];
     let checkVertArray: boolean[] = [];
-    let forLoopStartVertIndex = startVertIndex; 
+    let forLoopStartVertIndex = startVertIndex;
     //this will be an array of true or false for the check condition 
     for (let i = 0; i < this.draggedShipLength; i++) {
       checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
       checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
-      forLoopStartVertIndex += 10; 
+      forLoopStartVertIndex += 10;
     }
     // Will check the array for "every" boolean in the array and return one true or false 
     let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
-   // End of the ship drop overwrite Check 
-  
+    // End of the ship drop overwrite Check 
+
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
