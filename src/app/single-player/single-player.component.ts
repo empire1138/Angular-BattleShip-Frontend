@@ -1,6 +1,7 @@
 import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
+import {  NavigationExtras, Router } from '@angular/router';
 
 
 @Component({
@@ -61,7 +62,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.createBoard(this.computerGrid, this.computerSquares);
   }
 
-  constructor(private renderer: Renderer2, private he: ElementRef) { }
+  constructor(
+    private renderer: Renderer2, 
+    private he: ElementRef,
+    private router: Router
+    ) { }
 
   ngOnInit(): void {
 
@@ -232,6 +237,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   gameOver() {
     this.isGameOver = true
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 20000);
+    
   }
 
 

@@ -1,5 +1,5 @@
 <div class="container">
-  <div >
+  <div>
     <div
       #userGrid
       (dragstart)="onDragStart($event)"
@@ -17,12 +17,28 @@
 
 <div class="container hidden-info">
   <div class="setup-buttons" id="setup-buttons">
-    <button *ngIf="!isGameStarted" id="start" class="btn" [class.disabled-color]="!allShipsPlaced" [disabled]="!allShipsPlaced" (click)="startGame()">Start Game</button>
-    <button *ngIf="!isGameStarted" id="rotate" class="btn" (click)="rotateShips()">
+    <button
+      *ngIf="!isGameStarted"
+      id="start"
+      class="btn"
+      [class.disabled-color]="!allShipsPlaced"
+      [disabled]="!allShipsPlaced"
+      (click)="startGame()"
+    >
+      Start Game
+    </button>
+    <button
+      *ngIf="!isGameStarted"
+      id="rotate"
+      class="btn"
+      (click)="rotateShips()"
+    >
       Rotate Your Ships
     </button>
   </div>
-  <h3 id="whose-go" *ngIf="isGameStarted" class="info-text">{{currentPlayer === 'user' ? 'Player Turn' : 'Computers Turn' }}</h3>
+  <h3 id="whose-go" *ngIf="isGameStarted" class="info-text">
+    {{ currentPlayer === "user" ? "Player Turn" : "Computers Turn" }}
+  </h3>
   <h3 id="info" class="info-text">{{ infoMessageDisplay }}</h3>
 </div>
 
@@ -37,7 +53,7 @@
     <div
       class="ship"
       [ngClass]="
-      isHorizontal ? 'destroyer-container' : 'destroyer-container-vertical'
+        isHorizontal ? 'destroyer-container' : 'destroyer-container-vertical'
       "
       draggable="true"
     >
@@ -47,7 +63,7 @@
     <div
       class="ship"
       [ngClass]="
-      isHorizontal ? 'submarine-container' : 'submarine-container-vertical'
+        isHorizontal ? 'submarine-container' : 'submarine-container-vertical'
       "
       draggable="true"
     >
@@ -58,7 +74,7 @@
     <div
       class="ship"
       [ngClass]="
-      isHorizontal ? 'cruiser-container' : 'cruiser-container-vertical'
+        isHorizontal ? 'cruiser-container' : 'cruiser-container-vertical'
       "
       draggable="true"
     >
@@ -69,7 +85,7 @@
     <div
       class="ship"
       [ngClass]="
-      isHorizontal ? 'battleship-container' : 'battleship-container-vertical'
+        isHorizontal ? 'battleship-container' : 'battleship-container-vertical'
       "
       draggable="true"
     >
@@ -81,7 +97,7 @@
     <div
       class="ship"
       [ngClass]="
-      isHorizontal ? 'carrier-container' : 'carrier-container-vertical'
+        isHorizontal ? 'carrier-container' : 'carrier-container-vertical'
       "
       draggable="true"
     >

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-ending',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GameEndingComponent implements OnInit {
 
-  constructor() { }
+  winningPlayer!: string;
+  hasWiningPlayer: boolean = false; 
+
+  constructor(private router:Router)  { }
 
   ngOnInit(): void {
+  }
+
+  emptycheck(){
+    if (!this.hasWiningPlayer){
+      this.router.navigate(['']);
+    }
   }
 
 }
