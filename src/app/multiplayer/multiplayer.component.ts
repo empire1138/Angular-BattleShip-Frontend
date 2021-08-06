@@ -35,7 +35,7 @@ export class MultiplayerComponent implements OnInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
-  currentGameRoomNumber: number = 0; 
+  currentGameRoomNumber!: number; 
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -61,6 +61,7 @@ export class MultiplayerComponent implements OnInit {
   ngAfterViewInit() {
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
+    this.getRoomNumber(); 
   }
 
   constructor(private renderer: Renderer2,
@@ -74,7 +75,7 @@ export class MultiplayerComponent implements OnInit {
     //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
     // Get Room Number 
-    this.getRoomNumber(); 
+    //this.getRoomNumber(); 
     // Step 2 Receive the player number
     this.playerNumberReceived();
     // Step 3 Another player has connected or disconnected

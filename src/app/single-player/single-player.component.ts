@@ -1,6 +1,7 @@
 import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
+import {  NavigationExtras, Router } from '@angular/router';
 
 
 @Component({
@@ -64,7 +65,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.createBoard(this.computerGrid, this.computerSquares);
   }
 
-  constructor(private renderer: Renderer2, private he: ElementRef) { }
+  constructor(
+    private renderer: Renderer2, 
+    private he: ElementRef,
+    private router: Router
+    ) { }
 
   ngOnInit(): void {
 
@@ -235,6 +240,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   gameOver() {
     this.isGameOver = true
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 20000);
+    
   }
 
 
@@ -244,19 +253,21 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let current = ship.directions[randomDirection]
     let isTaken: boolean = false;
     console.log(current, 'current');
+    console.log(randomDirection, 'randomDirection')
     let direction: number = 0;
 
     // if (randomDirection === 0) direction = 1
     // if (randomDirection === 1) direction = 10
     if (randomDirection === 0) {
       direction = 1;
-    } else if (randomDirection === 1) { randomDirection = 10; }
+    } else if (randomDirection === 1) { direction = 10; }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
 
     console.log(randomStart, 'randomStart');
-
+    console.log(current, 'current2')
     isTaken = current.some((index: number) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    // 
     console.log(isTaken, 'isTaken');
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
