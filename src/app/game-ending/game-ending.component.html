@@ -1,7 +1,8 @@
 <div class="display-container">
     <div class="game-title">
-      <div>Congratulations</div>
-      <div>Winning player</div>
+      <div *ngIf="winningPlayer === 'Player'; else elseBlock" >Congratulations</div>
+      <ng-template #elseBlock></ng-template>
+      <div>{{ winningPlayer }}</div>
     </div>
     <div class="start-btn">
       <button mat-raised-button color="primary" >Return to Start Page</button>

@@ -1,6 +1,6 @@
 import { asNativeElements, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SocketioService } from '../service/socketIO/socketio.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
 
 
@@ -36,6 +36,8 @@ export class MultiplayerComponent implements OnInit {
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
   currentGameRoomNumber!: number; 
+  winingPlayer!:number;
+  hasWinningPlayer: boolean = false; 
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -67,7 +69,8 @@ export class MultiplayerComponent implements OnInit {
   constructor(private renderer: Renderer2,
     private he: ElementRef,
     private socketIO: SocketioService,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -367,6 +370,7 @@ export class MultiplayerComponent implements OnInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
+      this.winingPlayer = this.playerNum; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
@@ -377,6 +381,10 @@ export class MultiplayerComponent implements OnInit {
 
   gameOver() {
     this.isGameOver = true
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 5000);
+
   }
 
   //drag Events for the ships 

@@ -62,6 +62,7 @@ export class SocketioService {
   checkPlayersReceived() {
     return new Observable((observer) => {
       this.socket.on('check-players', (players: any) => {
+        console.log(players, 'CheckPLayersReceived')
         observer.next(players);
       })
     })

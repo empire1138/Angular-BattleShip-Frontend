@@ -1,7 +1,8 @@
 import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
-import {  NavigationExtras, Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
+import { SinglePlayerServiceService } from '../service/single-player/single-player-service.service';
 
 
 @Component({
@@ -35,6 +36,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
+  winingPlayer: string = '';
+  hasWinningPlayer: boolean = false; 
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -63,10 +66,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   }
 
   constructor(
-    private renderer: Renderer2, 
+    private renderer: Renderer2,
     private he: ElementRef,
-    private router: Router
-    ) { }
+    private router: Router,
+    private singlePlayerService: SinglePlayerServiceService
+  ) { }
 
   ngOnInit(): void {
 
@@ -227,20 +231,25 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
+      this.winingPlayer = 'Player'
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.winingPlayer = 'Computer'
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
+    this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer); 
     setTimeout(() => {
       this.router.navigate(['game-ending'])
-    }, 20000);
-    
+    }, 5000);
+
   }
 
 
