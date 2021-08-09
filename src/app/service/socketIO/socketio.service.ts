@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketioService {
   socket!: Socket;
+  roomNumber!: number;
 
 
   constructor() {
@@ -22,7 +23,7 @@ export class SocketioService {
   getPlayerNumber(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('player-number', number => {
-        console.log(number, 'NumberSocket')
+        console.log(number, 'PlayerNumber')
         observer.next(number);
       })
     })
@@ -31,14 +32,15 @@ export class SocketioService {
   getRoomReceived(){
     return new Observable((observer) => {
       this.socket.on('room-number', (roomNum: number) => {
-        console.log(roomNum)
+        console.log(roomNum,'roomNum')
+        this.roomNumber = roomNum; 
         observer.next(roomNum); 
       })
     } )
   }
   //Step 2-B
   checkPlayersEmit() {
-    this.socket.emit('check-players');
+    this.socket.emit('check-players', this.roomNumber);
     console.log('fired@2')
   }
   //Step 3
@@ -85,7 +87,7 @@ export class SocketioService {
   }
   //Step 7-B
   shotFiredReplyEmit(squareClassList: any) {
-    this.socket.emit('fire-reply', squareClassList);
+    this.socket.emit('fire-reply', squareClassList, this.roomNumber);
   }
   //Step 8
   shotFiredReplyReceived() {
@@ -97,11 +99,11 @@ export class SocketioService {
   }
   //Step 9 This starts after the user clicks the Start button
 playerReadyEmit() {
-    this.socket.emit('player-ready');
+    this.socket.emit('player-ready' ,this.roomNumber);
   }
   //Step 10 This is fired after each click from the user 
   shotFiredEmit(shotFired: number) {
-    this.socket.emit('fire', shotFired);
+    this.socket.emit('fire', shotFired,this.roomNumber);
     console.log('Real Shot Sent');
   }
 

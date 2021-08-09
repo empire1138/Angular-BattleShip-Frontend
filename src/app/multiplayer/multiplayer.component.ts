@@ -64,6 +64,7 @@ export class MultiplayerComponent implements OnInit {
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
     this.getRoomNumber(); 
+    
   }
 
   constructor(private renderer: Renderer2,
@@ -186,6 +187,7 @@ export class MultiplayerComponent implements OnInit {
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
     let player = `.p${parseInt(number) + 1}`
+    console.log(player, 'letPlayer')
     this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
     if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
   }
