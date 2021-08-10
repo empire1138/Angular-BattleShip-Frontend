@@ -40,14 +40,14 @@ export class SocketioService {
   }
   //Step 2-B
   checkPlayersEmit() {
-    this.socket.emit('check-players', this.roomNumber);
+    this.socket.emit('check-players');
     console.log('fired@2')
   }
   //Step 3
   playerConnectionReceived(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('player-connection', (num: any) => {
-        console.log('PlayConnections')
+        console.log('PlayConnections', num)
         observer.next(num);
       })
     })
