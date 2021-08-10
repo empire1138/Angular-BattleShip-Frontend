@@ -56,6 +56,7 @@ export class SocketioService {
   enemyReady() {
     return new Observable((observer) => {
       this.socket.on('enemy-ready', (num: any) => {
+        console.log(num, 'enemy-number')
         observer.next(num);
       })
     })
@@ -107,7 +108,19 @@ playerReadyEmit() {
     console.log('Real Shot Sent');
   }
 
-
+  //Testing other plyerNumber
+  otherPlayerNumber(){
+    return new Observable((observer) => {
+      this.socket.on('enemy-player-number', (enemyNumber: number) => {
+        console.log(enemyNumber, ': Other Player Number'); 
+        observer.next(enemyNumber); 
+      })
+    })
+  }
+  // test Step
+  emitPlayerNumberOnConnect(playerNumber:number){
+    this.socket.emit('emit-playerNumber-OnConnect', playerNumber)
+  }
   
 
   disconnect() {

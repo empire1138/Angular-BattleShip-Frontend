@@ -27,6 +27,7 @@ export class MultiplayerComponent implements OnInit {
   isGameOver: boolean = false
   currentPlayer: string = 'user'
   playerNum: number = 0
+  otherPlayerNumber!: number;
   ready: boolean = false
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
@@ -94,6 +95,8 @@ export class MultiplayerComponent implements OnInit {
     this.fireReceived();
     //Step 8
     this.fireRelyReceived();
+    //Test 
+    this.getOtherPLayerNumber(); 
 
   }
 
@@ -181,9 +184,13 @@ export class MultiplayerComponent implements OnInit {
     this.socketIO.playerConnectionReceived().subscribe((number: any) => {
       console.log(`Player number ${number} has connected or disconnected`)
       //Step 3-A calls function to display the Info on Screen
+      //this.otherPlayerNumber = number; 
+      this.getOtherPLayerNumber();
       this.playerConnectedOrDisconnected(number);
     })
   }
+  
+
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
     let player = `.p${parseInt(number) + 1}`
@@ -244,8 +251,17 @@ export class MultiplayerComponent implements OnInit {
   }
 
 
-
-
+//Testing 
+  getOtherPLayerNumber(){
+    this.socketIO.otherPlayerNumber().subscribe((enemyNumber: any) => {
+      console.log(enemyNumber, 'enemyNumber');
+      this.otherPlayerNumber= enemyNumber; 
+    })
+  }
+//testStep
+sendPlayerNumberOnConnect(){
+  this.socketIO.emitPlayerNumberOnConnect(this.playerNum); 
+}
 
 
   playGameMulti() {
