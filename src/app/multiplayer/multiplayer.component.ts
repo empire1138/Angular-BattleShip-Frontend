@@ -36,9 +36,9 @@ export class MultiplayerComponent implements OnInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
-  currentGameRoomNumber!: number; 
-  winingPlayer!:number;
-  hasWinningPlayer: boolean = false; 
+  currentGameRoomNumber!: number;
+  winingPlayer!: number;
+  hasWinningPlayer: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -64,8 +64,8 @@ export class MultiplayerComponent implements OnInit {
   ngAfterViewInit() {
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
-    this.getRoomNumber(); 
-    
+    this.getRoomNumber();
+
   }
 
   constructor(private renderer: Renderer2,
@@ -96,7 +96,7 @@ export class MultiplayerComponent implements OnInit {
     //Step 8
     this.fireRelyReceived();
     //Test 
-    this.getOtherPLayerNumber(); 
+    this.getOtherPLayerNumber();
 
   }
 
@@ -155,9 +155,9 @@ export class MultiplayerComponent implements OnInit {
     })
   }
   //New Step Get Room Number 
-  getRoomNumber(){
+  getRoomNumber() {
     this.socketIO.getRoomReceived().subscribe((number: any) => {
-      this.currentGameRoomNumber = number; 
+      this.currentGameRoomNumber = number;
     })
   }
 
@@ -189,7 +189,7 @@ export class MultiplayerComponent implements OnInit {
       this.playerConnectedOrDisconnected(number);
     })
   }
-  
+
 
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
@@ -251,17 +251,17 @@ export class MultiplayerComponent implements OnInit {
   }
 
 
-//Testing 
-  getOtherPLayerNumber(){
+  //Testing 
+  getOtherPLayerNumber() {
     this.socketIO.otherPlayerNumber().subscribe((enemyNumber: any) => {
       console.log(enemyNumber, 'enemyNumber');
-      this.otherPlayerNumber= enemyNumber; 
+      this.otherPlayerNumber = enemyNumber;
     })
   }
-//testStep
-sendPlayerNumberOnConnect(){
-  this.socketIO.emitPlayerNumberOnConnect(this.playerNum); 
-}
+  //testStep
+  sendPlayerNumberOnConnect() {
+    this.socketIO.emitPlayerNumberOnConnect(this.playerNum);
+  }
 
 
   playGameMulti() {
@@ -388,7 +388,7 @@ sendPlayerNumberOnConnect(){
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
-      this.winingPlayer = this.playerNum; 
+      this.winingPlayer = this.playerNum;
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
@@ -461,17 +461,17 @@ sendPlayerNumberOnConnect(){
     //Start of the ship drop overwrite check.  
     let checkHertArray: boolean[] = [];
     let checkVertArray: boolean[] = [];
-    let forLoopStartVertIndex = startVertIndex; 
+    let forLoopStartVertIndex = startVertIndex;
     //this will be an array of true or false for the check condition 
     for (let i = 0; i < this.draggedShipLength; i++) {
       checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
       checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
-      forLoopStartVertIndex += 10; 
+      forLoopStartVertIndex += 10;
     }
     // Will check the array for every boolean in the array and return one true or false 
     let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
-   // End of the ship drop overwrite Check 
-  
+    // End of the ship drop overwrite Check 
+
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass

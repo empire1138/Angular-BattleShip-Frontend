@@ -119,9 +119,17 @@ playerReadyEmit() {
   }
   // test Step
   emitPlayerNumberOnConnect(playerNumber:number){
-    this.socket.emit('emit-playerNumber-OnConnect', playerNumber)
+    this.socket.emit('emit-playerNumber-OnConnect', this.roomNumber, playerNumber)
   }
-  
+  //Part of Test Step
+  otherPlayerNumberReceived(){
+    return new Observable((observer) => {
+      this.socket.on('playerNumber-joined-room', (otherPlayerNumber: number) => {
+        console.log(otherPlayerNumber, ':Got other player Number')
+        observer.next(otherPlayerNumber); 
+      })
+    })
+  }
 
   disconnect() {
     if (this.socket) {
