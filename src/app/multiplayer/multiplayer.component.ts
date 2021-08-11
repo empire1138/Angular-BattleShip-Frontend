@@ -97,6 +97,8 @@ export class MultiplayerComponent implements OnInit {
     this.fireRelyReceived();
     //Test 
     this.getOtherPLayerNumber();
+    //test
+    this.getOtherPlayerNumberJoinRoomEvent();
 
   }
 
@@ -184,8 +186,9 @@ export class MultiplayerComponent implements OnInit {
     this.socketIO.playerConnectionReceived().subscribe((number: any) => {
       console.log(`Player number ${number} has connected or disconnected`)
       //Step 3-A calls function to display the Info on Screen
-      //this.otherPlayerNumber = number; 
-      this.getOtherPLayerNumber();
+
+      //this.getOtherPLayerNumber();
+      this.sendPlayerNumberOnConnect();
       this.playerConnectedOrDisconnected(number);
     })
   }
@@ -193,10 +196,11 @@ export class MultiplayerComponent implements OnInit {
 
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
     console.log(player, 'letPlayer')
     this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
-    if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
+    if (playerNumber === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
   }
 
   //Step 4 On enemy ready move forward with the game  Receive
@@ -209,13 +213,22 @@ export class MultiplayerComponent implements OnInit {
   //Step 5. Check player status Receive
   checkPlayersReceiver() {
     this.socketIO.checkPlayersReceived().subscribe((players: any) => {
-      players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
-        if (p.connected) this.playerConnectedOrDisconnected(i)
-        if (p.ready) {
-          this.playerReady(i)
-          if (i !== this.playerReady) this.enemyReady = true
-        }
-      })
+      // players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
+      //   if (p.connected) this.playerConnectedOrDisconnected(i)
+      //   if (p.ready) {
+      //     this.playerReady(i);
+      //     console.log(i !== this.playerReady, 'i !== this.playerReady');
+      //     //if (i !== this.playerReady) this.enemyReady = true
+      //   }
+      // })
+      console.log(players[this.playerNum], 'player Check');
+      if(players[this.playerNum].connected) this.playerConnectedOrDisconnected(this.playerNum);
+      if(players[this.playerNum].ready)this.playerReady(this.playerNum); 
+        
+      console.log(players[this.otherPlayerNumber], 'otherplayer Check')
+      if(players[this.otherPlayerNumber].connected) this.playerConnectedOrDisconnected(this.otherPlayerNumber);
+      if(players[this.otherPlayerNumber].ready)this.playerReady(this.otherPlayerNumber); 
+      
     })
   }
 
@@ -246,7 +259,8 @@ export class MultiplayerComponent implements OnInit {
   }
 
   playerReady(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
     this.playerDisplay.nativeElement.querySelector(`${player} .ready`).classList.toggle('active')
   }
 
@@ -261,6 +275,12 @@ export class MultiplayerComponent implements OnInit {
   //testStep
   sendPlayerNumberOnConnect() {
     this.socketIO.emitPlayerNumberOnConnect(this.playerNum);
+  }
+  getOtherPlayerNumberJoinRoomEvent() {
+    this.socketIO.otherPlayerNumberReceived().subscribe((otherPlayerNumber: any) => {
+      this.otherPlayerNumber = otherPlayerNumber;
+      console.log(this.otherPlayerNumber, 'Received Other Player NUmber')
+    })
   }
 
 
