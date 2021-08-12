@@ -36,6 +36,7 @@
     >
       Rotate Your Ships
     </button>
+    <button class="btn" (click)="autoPlaceShips()" >Auto Place Ships</button>
   </div>
   <h3 id="whose-go" *ngIf="isGameStarted" class="info-text">
     {{ currentPlayer === "user" ? "Player Turn" : "Computers Turn" }}

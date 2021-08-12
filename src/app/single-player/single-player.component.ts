@@ -287,6 +287,51 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
 
+  autoPlaceShips(){
+    this.clearUserGrid(); 
+    this.generatePlayersShips(this.shipArray[0]);
+    this.generatePlayersShips(this.shipArray[1]);
+    this.generatePlayersShips(this.shipArray[2]);
+    this.generatePlayersShips(this.shipArray[3]);
+    this.generatePlayersShips(this.shipArray[4]);
+  }
+
+  generatePlayersShips(ship:any){
+    let randomDirection = Math.floor(Math.random() * ship.directions.length)
+    let current = ship.directions[randomDirection]
+    let isTaken: boolean = false;
+    console.log(current, 'current');
+    console.log(randomDirection, 'randomDirection')
+    let direction: number = 0;
+
+    // if (randomDirection === 0) direction = 1
+    // if (randomDirection === 1) direction = 10
+    if (randomDirection === 0) {
+      direction = 1;
+    } else if (randomDirection === 1) { direction = 10; }
+
+    let randomStart = Math.abs(Math.floor(Math.random() * this.userSquares.length - (ship.directions[0].length * direction)))
+
+    console.log(randomStart, 'randomStart');
+    console.log(current, 'current2')
+    isTaken = current.some((index: number) => this.userSquares[randomStart + index].classList.contains('taken'))
+    // 
+    console.log(isTaken, 'isTaken');
+    const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
+    const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
+
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.userSquares[randomStart + index].classList.add('taken', ship.name))
+
+    else this.generatePlayersShips(ship)
+  }
+
+  clearUserGrid(){
+    this.userSquares.forEach((square: any) => {
+      if(square.classList.contains('taken')){
+        square.classList.remove('taken'); 
+      }
+    })
+  }
 
   //drag Events for the ships 
   onDragStart(event: any) {
