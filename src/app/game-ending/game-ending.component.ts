@@ -33,6 +33,22 @@ export class GameEndingComponent implements OnInit {
     this.hasWiningPlayer = this.singlePlayerService.returnHasWinningPlayer();
 
   }
+
+  startMultiPlayer() {
+    // switch to game lobby page then do the websocket calls
+    this.router.navigate(['multiplayer-GameLobby']);
+  }
+  startSinglePlayer() {
+    // switch to game lobby page then do the websocket calls
+    this.router.navigate(['single-player']);
+  }
+  returnToStart() {
+    // switch to game lobby page then do the websocket calls
+    this.router.navigate(['']);
+  }
+
+
+
     
 
 }

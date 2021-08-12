@@ -200,7 +200,7 @@ export class MultiplayerComponent implements OnInit {
     let player = `.p${playerNumber + 1}`
     console.log(player, 'letPlayer')
     this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
-    if (playerNumber === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
+    if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
   }
 
   //Step 4 On enemy ready move forward with the game  Receive
@@ -408,11 +408,12 @@ export class MultiplayerComponent implements OnInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
-      this.winingPlayer = this.playerNum;
+      this.winingPlayer = (this.playerNum % 2 == 0) ? 2 : 1;
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.winingPlayer = (this.otherPlayerNumber % 2 == 0) ? 2 : 1;
       this.gameOver()
     }
   }

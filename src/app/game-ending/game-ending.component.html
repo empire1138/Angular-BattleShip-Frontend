@@ -5,8 +5,8 @@
       <div>{{ winningPlayer }}</div>
     </div>
     <div class="start-btn">
-      <button mat-raised-button color="primary" >Return to Start Page</button>
-      <button mat-raised-button color="primary" >Play Single Player</button>
-      <button mat-raised-button color="primary" >Play Multiplayer</button>
+      <button mat-raised-button color="primary" (click)="returnToStart()" >Return to Start Page</button>
+      <button mat-raised-button color="primary" (click)="startSinglePlayer()">Play Single Player</button>
+      <button mat-raised-button color="primary" (click)="startMultiPlayer()">Play Multiplayer</button>
     </div>
   </div>
