@@ -1,7 +1,8 @@
 import { asNativeElements, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SocketioService } from '../service/socketIO/socketio.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
+import { MultiplayerServiceService } from '../service/multiplayer/multiplayer-service.service';
 
 
 @Component({
@@ -27,6 +28,8 @@ export class MultiplayerComponent implements OnInit {
   isGameOver: boolean = false
   currentPlayer: string = 'user'
   playerNum: number = 0
+  otherPlayerNumber!: number;
+  currentPlayerNumberConverted: number = (this.playerNum % 2 == 0) ? 2 : 1;
   ready: boolean = false
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
@@ -35,7 +38,9 @@ export class MultiplayerComponent implements OnInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
-  currentGameRoomNumber!: number; 
+  currentGameRoomNumber!: number;
+  winingPlayer!: number;
+  hasWinningPlayer: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -61,13 +66,16 @@ export class MultiplayerComponent implements OnInit {
   ngAfterViewInit() {
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
-    this.getRoomNumber(); 
+    this.getRoomNumber();
+
   }
 
   constructor(private renderer: Renderer2,
     private he: ElementRef,
     private socketIO: SocketioService,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private router: Router,
+    private multiplayerService: MultiplayerServiceService 
   ) { }
 
   ngOnInit(): void {
@@ -90,6 +98,10 @@ export class MultiplayerComponent implements OnInit {
     this.fireReceived();
     //Step 8
     this.fireRelyReceived();
+    //Test 
+    this.getOtherPLayerNumber();
+    //test
+    this.getOtherPlayerNumberJoinRoomEvent();
 
   }
 
@@ -148,9 +160,9 @@ export class MultiplayerComponent implements OnInit {
     })
   }
   //New Step Get Room Number 
-  getRoomNumber(){
+  getRoomNumber() {
     this.socketIO.getRoomReceived().subscribe((number: any) => {
-      this.currentGameRoomNumber = number; 
+      this.currentGameRoomNumber = number;
     })
   }
 
@@ -177,12 +189,19 @@ export class MultiplayerComponent implements OnInit {
     this.socketIO.playerConnectionReceived().subscribe((number: any) => {
       console.log(`Player number ${number} has connected or disconnected`)
       //Step 3-A calls function to display the Info on Screen
+
+      //this.getOtherPLayerNumber();
+      this.sendPlayerNumberOnConnect();
       this.playerConnectedOrDisconnected(number);
     })
   }
+
+
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
+    console.log(player, 'letPlayer')
     this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
     if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
   }
@@ -197,13 +216,22 @@ export class MultiplayerComponent implements OnInit {
   //Step 5. Check player status Receive
   checkPlayersReceiver() {
     this.socketIO.checkPlayersReceived().subscribe((players: any) => {
-      players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
-        if (p.connected) this.playerConnectedOrDisconnected(i)
-        if (p.ready) {
-          this.playerReady(i)
-          if (i !== this.playerReady) this.enemyReady = true
-        }
-      })
+      // players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
+      //   if (p.connected) this.playerConnectedOrDisconnected(i)
+      //   if (p.ready) {
+      //     this.playerReady(i);
+      //     console.log(i !== this.playerReady, 'i !== this.playerReady');
+      //     //if (i !== this.playerReady) this.enemyReady = true
+      //   }
+      // })
+      console.log(players[this.playerNum], 'player Check');
+      if(players[this.playerNum].connected) this.playerConnectedOrDisconnected(this.playerNum);
+      if(players[this.playerNum].ready)this.playerReady(this.playerNum); 
+        
+      console.log(players[this.otherPlayerNumber], 'otherplayer Check')
+      if(players[this.otherPlayerNumber].connected) this.playerConnectedOrDisconnected(this.otherPlayerNumber);
+      if(players[this.otherPlayerNumber].ready)this.playerReady(this.otherPlayerNumber); 
+      
     })
   }
 
@@ -234,13 +262,29 @@ export class MultiplayerComponent implements OnInit {
   }
 
   playerReady(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
     this.playerDisplay.nativeElement.querySelector(`${player} .ready`).classList.toggle('active')
   }
 
 
-
-
+  //Testing 
+  getOtherPLayerNumber() {
+    this.socketIO.otherPlayerNumber().subscribe((enemyNumber: any) => {
+      console.log(enemyNumber, 'enemyNumber');
+      this.otherPlayerNumber = enemyNumber;
+    })
+  }
+  //testStep
+  sendPlayerNumberOnConnect() {
+    this.socketIO.emitPlayerNumberOnConnect(this.playerNum);
+  }
+  getOtherPlayerNumberJoinRoomEvent() {
+    this.socketIO.otherPlayerNumberReceived().subscribe((otherPlayerNumber: any) => {
+      this.otherPlayerNumber = otherPlayerNumber;
+      console.log(this.otherPlayerNumber, 'Received Other Player NUmber')
+    })
+  }
 
 
   playGameMulti() {
@@ -367,16 +411,25 @@ export class MultiplayerComponent implements OnInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
+      this.winingPlayer = (this.playerNum % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.winingPlayer = (this.otherPlayerNumber % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
+    this.multiplayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer, this.currentPlayerNumberConverted); 
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 5000);
+
   }
 
   //drag Events for the ships 
@@ -435,17 +488,17 @@ export class MultiplayerComponent implements OnInit {
     //Start of the ship drop overwrite check.  
     let checkHertArray: boolean[] = [];
     let checkVertArray: boolean[] = [];
-    let forLoopStartVertIndex = startVertIndex; 
+    let forLoopStartVertIndex = startVertIndex;
     //this will be an array of true or false for the check condition 
     for (let i = 0; i < this.draggedShipLength; i++) {
       checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
       checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
-      forLoopStartVertIndex += 10; 
+      forLoopStartVertIndex += 10;
     }
     // Will check the array for every boolean in the array and return one true or false 
     let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
-   // End of the ship drop overwrite Check 
-  
+    // End of the ship drop overwrite Check 
+
     if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass

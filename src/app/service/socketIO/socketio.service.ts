@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketioService {
   socket!: Socket;
+  roomNumber!: number;
 
 
   constructor() {
@@ -22,7 +23,7 @@ export class SocketioService {
   getPlayerNumber(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('player-number', number => {
-        console.log(number, 'NumberSocket')
+        console.log(number, 'PlayerNumber')
         observer.next(number);
       })
     })
@@ -31,7 +32,8 @@ export class SocketioService {
   getRoomReceived(){
     return new Observable((observer) => {
       this.socket.on('room-number', (roomNum: number) => {
-        console.log(roomNum)
+        console.log(roomNum,'roomNum')
+        this.roomNumber = roomNum; 
         observer.next(roomNum); 
       })
     } )
@@ -45,7 +47,7 @@ export class SocketioService {
   playerConnectionReceived(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('player-connection', (num: any) => {
-        console.log('PlayConnections')
+        console.log('PlayConnections', num)
         observer.next(num);
       })
     })
@@ -54,6 +56,7 @@ export class SocketioService {
   enemyReady() {
     return new Observable((observer) => {
       this.socket.on('enemy-ready', (num: any) => {
+        console.log(num, 'enemy-number')
         observer.next(num);
       })
     })
@@ -62,6 +65,7 @@ export class SocketioService {
   checkPlayersReceived() {
     return new Observable((observer) => {
       this.socket.on('check-players', (players: any) => {
+        console.log(players, 'CheckPLayersReceived')
         observer.next(players);
       })
     })
@@ -84,7 +88,7 @@ export class SocketioService {
   }
   //Step 7-B
   shotFiredReplyEmit(squareClassList: any) {
-    this.socket.emit('fire-reply', squareClassList);
+    this.socket.emit('fire-reply', squareClassList, this.roomNumber);
   }
   //Step 8
   shotFiredReplyReceived() {
@@ -96,16 +100,36 @@ export class SocketioService {
   }
   //Step 9 This starts after the user clicks the Start button
 playerReadyEmit() {
-    this.socket.emit('player-ready');
+    this.socket.emit('player-ready' ,this.roomNumber);
   }
   //Step 10 This is fired after each click from the user 
   shotFiredEmit(shotFired: number) {
-    this.socket.emit('fire', shotFired);
+    this.socket.emit('fire', shotFired,this.roomNumber);
     console.log('Real Shot Sent');
   }
 
-
-  
+  //Testing other plyerNumber
+  otherPlayerNumber(){
+    return new Observable((observer) => {
+      this.socket.on('enemy-player-number', (enemyNumber: number) => {
+        console.log(enemyNumber, ': Other Player Number'); 
+        observer.next(enemyNumber); 
+      })
+    })
+  }
+  // test Step
+  emitPlayerNumberOnConnect(playerNumber:number){
+    this.socket.emit('emit-playerNumber-OnConnect', this.roomNumber, playerNumber)
+  }
+  //Part of Test Step
+  otherPlayerNumberReceived(){
+    return new Observable((observer) => {
+      this.socket.on('playerNumber-joined-room', (otherPlayerNumber: number) => {
+        console.log(otherPlayerNumber, ':Got other player Number')
+        observer.next(otherPlayerNumber); 
+      })
+    })
+  }
 
   disconnect() {
     if (this.socket) {
