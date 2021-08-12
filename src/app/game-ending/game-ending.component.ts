@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SinglePlayerServiceService } from '../service/single-player/single-player-service.service';
+import { MultiplayerServiceService } from '../service/multiplayer/multiplayer-service.service';
 
 @Component({
   selector: 'app-game-ending',
@@ -9,16 +10,21 @@ import { SinglePlayerServiceService } from '../service/single-player/single-play
 })
 export class GameEndingComponent implements OnInit {
 
-  winningPlayer!: string;
+  winningSinglePlayer!: string;
   hasWiningPlayer: boolean = false; 
+
+  winningMultiPlayer!: number;
+  currentMultiPlayer!: number; 
 
   constructor(
     private router:Router,
-    private singlePlayerService: SinglePlayerServiceService
+    private singlePlayerService: SinglePlayerServiceService,
+    private multiPlayerService: MultiplayerServiceService
     )  { }
 
   ngOnInit(): void {
-    this.getWinningInfo(); 
+    this.getSinglePlayerWinningInfo(); 
+    this.getMultiPlayerWinningInfo(); 
     this.emptyCheck(); 
   }
 
@@ -28,10 +34,15 @@ export class GameEndingComponent implements OnInit {
     }
   }
 
-  getWinningInfo(){
-    this.winningPlayer = this.singlePlayerService.returnWinningPlayer();
+  getSinglePlayerWinningInfo(){
+    this.winningSinglePlayer = this.singlePlayerService.returnWinningPlayer();
     this.hasWiningPlayer = this.singlePlayerService.returnHasWinningPlayer();
 
+  }
+  getMultiPlayerWinningInfo(){
+    this.winningMultiPlayer = this.multiPlayerService.returnWinningPlayer();
+    this.hasWiningPlayer = this.multiPlayerService.returnHasWinningPlayer();
+    this.currentMultiPlayer = this.multiPlayerService.returnPlayerNumberConverted(); 
   }
 
   startMultiPlayer() {

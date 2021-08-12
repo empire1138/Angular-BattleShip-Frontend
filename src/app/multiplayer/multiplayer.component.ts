@@ -2,6 +2,7 @@ import { asNativeElements, Component, ElementRef, OnInit, Renderer2, ViewChild }
 import { SocketioService } from '../service/socketIO/socketio.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
+import { MultiplayerServiceService } from '../service/multiplayer/multiplayer-service.service';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class MultiplayerComponent implements OnInit {
   currentPlayer: string = 'user'
   playerNum: number = 0
   otherPlayerNumber!: number;
+  currentPlayerNumberConverted: number = (this.playerNum % 2 == 0) ? 2 : 1;
   ready: boolean = false
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
@@ -72,7 +74,8 @@ export class MultiplayerComponent implements OnInit {
     private he: ElementRef,
     private socketIO: SocketioService,
     private activeRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private multiplayerService: MultiplayerServiceService 
   ) { }
 
   ngOnInit(): void {
@@ -409,17 +412,20 @@ export class MultiplayerComponent implements OnInit {
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
       this.winingPlayer = (this.playerNum % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
       this.winingPlayer = (this.otherPlayerNumber % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
+    this.multiplayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer, this.currentPlayerNumberConverted); 
     setTimeout(() => {
       this.router.navigate(['game-ending'])
     }, 5000);
