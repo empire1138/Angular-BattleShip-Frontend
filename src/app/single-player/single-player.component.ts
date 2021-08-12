@@ -244,6 +244,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
     console.log(current, 'current');
+    let isTaken:boolean = false;
     let direction: number = 0;
 
     // if (randomDirection === 0) direction = 1
@@ -253,8 +254,10 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     } else if (randomDirection === 1) { randomDirection = 10; }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
+    console.log(randomDirection,"randomDirection")
+    console.log(randomStart,"random start")
 
-    const isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
     console.log(isTaken, 'isTaken');
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
