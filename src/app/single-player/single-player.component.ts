@@ -1,6 +1,8 @@
 import { ThrowStmt } from '@angular/compiler';
 import { AfterViewInit, Component, Directive, ElementRef, OnInit, Query, Renderer2, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
+import { NavigationExtras, Router } from '@angular/router';
+import { SinglePlayerServiceService } from '../service/single-player/single-player-service.service';
 
 
 @Component({
@@ -37,6 +39,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   infoMessageDisplay: string = '';
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
+  winingPlayer: string = '';
+  hasWinningPlayer: boolean = false; 
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -64,7 +68,12 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.createBoard(this.computerGrid, this.computerSquares);
   }
 
-  constructor(private renderer: Renderer2, private he: ElementRef) { }
+  constructor(
+    private renderer: Renderer2,
+    private he: ElementRef,
+    private router: Router,
+    private singlePlayerService: SinglePlayerServiceService
+  ) { }
 
   ngOnInit(): void {
 
@@ -114,9 +123,9 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
         if (!this.returnHitMissCheck) {
           this.revealSquare(square.classList)
         }
-        this.returnHitMissCheck = false; 
+        this.returnHitMissCheck = false;
       }))
-     
+
     }
     if (this.currentPlayer === 'enemy') {
       setTimeout(() => {
@@ -226,16 +235,25 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
+      this.winingPlayer = 'Player'
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.winingPlayer = 'Computer'
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
+    this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer); 
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 5000);
+
   }
 
 
@@ -243,21 +261,25 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   generateComputerShips(ship: any) {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
+    let isTaken: boolean = false;
     console.log(current, 'current');
-    let isTaken:boolean = false;
+    console.log(randomDirection, 'randomDirection')
     let direction: number = 0;
 
     // if (randomDirection === 0) direction = 1
     // if (randomDirection === 1) direction = 10
     if (randomDirection === 0) {
       direction = 1;
-    } else if (randomDirection === 1) { randomDirection = 10; }
+    } else if (randomDirection === 1) { direction = 10; }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
     console.log(randomDirection,"randomDirection")
     console.log(randomStart,"random start")
 
-    isTaken = current.some((index: any) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    console.log(randomStart, 'randomStart');
+    console.log(current, 'current2')
+    isTaken = current.some((index: number) => this.computerSquares[randomStart + index].classList.contains('taken'))
+    // 
     console.log(isTaken, 'isTaken');
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
@@ -299,10 +321,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     let shipNameWithLastID = this.draggedShip.lastChild.id;
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
-    console.log(lastShipIndex, 'LastShipIndex');
-    console.log(parseInt(event.target.dataset.id), 'event.target.dataset.id')
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    let shipLastIdVert = parseInt(event.target.dataset.id) + (10 * lastShipIndex);
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
@@ -312,10 +331,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
     shipLastId = shipLastId - selectedShipIndex
-    let shipLastIdVert2 = shipLastIdVert - selectedShipIndex;
-    console.log(shipLastIdVert2, 'shipLastIDVert2');
-    //let vertShipLastId = 
-    console.log(shipLastId, 'ThirdShipLastID');
 
     // vert bug start  trying to get the vert bug just right 
     //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
@@ -327,16 +342,31 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
-    let startIndexHertCheck = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
-    let startIndexVertCheck = this.userSquares[startVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !startIndexHertCheck && !startIndexVertCheck) {
+
+    //Start of the ship drop overwrite check.  
+    let checkHertArray: boolean[] = [];
+    let checkVertArray: boolean[] = [];
+    let forLoopStartVertIndex = startVertIndex;
+    //this will be an array of true or false for the check condition 
+    for (let i = 0; i < this.draggedShipLength; i++) {
+      checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+      checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+      forLoopStartVertIndex += 10;
+    }
+    // Will check the array for "every" boolean in the array and return one true or false 
+    let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
+    // End of the ship drop overwrite Check 
+
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
         this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
       }
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !startIndexHertCheck && !startIndexVertCheck) {
+      //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
+      //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'

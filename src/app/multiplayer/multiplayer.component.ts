@@ -1,7 +1,8 @@
 import { asNativeElements, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SocketioService } from '../service/socketIO/socketio.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ThisReceiver } from '@angular/compiler';
+import { MultiplayerServiceService } from '../service/multiplayer/multiplayer-service.service';
 
 
 @Component({
@@ -27,12 +28,19 @@ export class MultiplayerComponent implements OnInit {
   isGameOver: boolean = false
   currentPlayer: string = 'user'
   playerNum: number = 0
+  otherPlayerNumber!: number;
+  currentPlayerNumberConverted: number = (this.playerNum % 2 == 0) ? 2 : 1;
   ready: boolean = false
   enemyReady: boolean = false
   allShipsPlaced: boolean = false
   shotFired: number = -1
   gameMode: string = 'multiPlayer'
   infoMessageDisplay: string = '';
+  firedShotsArray: number[] = []
+  returnHitMissCheck: boolean = false;
+  currentGameRoomNumber!: number;
+  winingPlayer!: number;
+  hasWinningPlayer: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -58,33 +66,43 @@ export class MultiplayerComponent implements OnInit {
   ngAfterViewInit() {
     this.createBoard(this.userGrid, this.userSquares);
     this.createBoard(this.computerGrid, this.computerSquares);
+    this.getRoomNumber();
+
   }
 
   constructor(private renderer: Renderer2,
     private he: ElementRef,
     private socketIO: SocketioService,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private router: Router,
+    private multiplayerService: MultiplayerServiceService 
   ) { }
 
   ngOnInit(): void {
-    this.infoMessageDisplay="Place the ships on the game grid then click Start Game"
-     //Step 1 Setup the connection and request for a Player Number. In socketIO Service
+    this.infoMessageDisplay = "Place the ships on the game grid then click Start Game"
+    //Step 1 Setup the connection and request for a Player Number. In socketIO Service
     this.socketIO.setupSocketConnection();
+    // Get Room Number 
+    //this.getRoomNumber(); 
     // Step 2 Receive the player number
     this.playerNumberReceived();
     // Step 3 Another player has connected or disconnected
     this.playerConnection();
     // Step 4 "enemyplayer" ready
-    this.playerEnemyReady();  
+    this.playerEnemyReady();
     //Step 5 Check player Status 
-    this. checkPlayersReceiver(); 
+    this.checkPlayersReceiver();
     //step 6 timeout Check Limit 
-    this.timedOut(); 
+    this.timedOut();
     //Step 7
     this.fireReceived();
     //Step 8
-    this.fireRelyReceived();  
-    
+    this.fireRelyReceived();
+    //Test 
+    this.getOtherPLayerNumber();
+    //test
+    this.getOtherPlayerNumberJoinRoomEvent();
+
   }
 
   rotateShips() {
@@ -98,25 +116,54 @@ export class MultiplayerComponent implements OnInit {
     this.infoMessageDisplay = '';
   }
 
-  
+
   startMultiPlayer() {
-   
+
 
     console.log(this.currentPlayer, 'current player');
     console.log(this.ready, 'this.ready')
-    console.log(this.enemyReady, 'enemyReady'); 
+    console.log(this.enemyReady, 'enemyReady');
     this.computerSquares.forEach((square: any) => {
       square.addEventListener('click', () => {
         if (this.currentPlayer === 'user' && this.ready && this.enemyReady) {
           this.shotFired = square.dataset.id
-          console.log(this.shotFired,'shotFIRED');
+          this.hitMissCheck(this.shotFired);
+          console.log(this.shotFired, 'shotFIRED');
           //Step 10
-          this.socketIO.shotFiredEmit(this.shotFired);
+          if (!this.returnHitMissCheck) {
+            this.socketIO.shotFiredEmit(this.shotFired);
+          }
         }
+        this.returnHitMissCheck = false;
       })
     })
 
-      
+
+  }
+  hitMissCheck(clickedSquare: number) {
+    let foundHitMissCheck: number = 0;
+
+    this.firedShotsArray.push(clickedSquare);
+    console.log(this.firedShotsArray, 'firedshotsArray')
+    //Goes though the array of fired shots and checks for duplicates. When it finds the duplicates prints the copy
+    for (let i = 0; i < this.firedShotsArray.length; i++) {
+
+      if (this.firedShotsArray.indexOf(this.firedShotsArray[i]) !== this.firedShotsArray.lastIndexOf(this.firedShotsArray[i])) {
+        foundHitMissCheck = this.firedShotsArray[i];
+        this.returnHitMissCheck = true
+        console.log(foundHitMissCheck, 'foundHitMissCheck');
+      }
+    }
+    //this removes the duplicate from the array 
+    this.firedShotsArray = this.firedShotsArray.filter((item, index) => {
+      return this.firedShotsArray.indexOf(item) === index;
+    })
+  }
+  //New Step Get Room Number 
+  getRoomNumber() {
+    this.socketIO.getRoomReceived().subscribe((number: any) => {
+      this.currentGameRoomNumber = number;
+    })
   }
 
   //Step 2
@@ -142,17 +189,24 @@ export class MultiplayerComponent implements OnInit {
     this.socketIO.playerConnectionReceived().subscribe((number: any) => {
       console.log(`Player number ${number} has connected or disconnected`)
       //Step 3-A calls function to display the Info on Screen
+
+      //this.getOtherPLayerNumber();
+      this.sendPlayerNumberOnConnect();
       this.playerConnectedOrDisconnected(number);
     })
   }
+
+
   //Step 3-A 
   playerConnectedOrDisconnected(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
+    console.log(player, 'letPlayer')
     this.playerDisplay.nativeElement.querySelector(`${player} .connected`).classList.toggle('active')
     if (parseInt(number) === this.playerNum) this.playerDisplay.nativeElement.querySelector(player).style.fontWeight = 'bold'
   }
 
- //Step 4 On enemy ready move forward with the game  Receive
+  //Step 4 On enemy ready move forward with the game  Receive
   playerEnemyReady() {
     this.socketIO.enemyReady().subscribe((number: any) => {
       this.enemyReady = true;
@@ -162,26 +216,36 @@ export class MultiplayerComponent implements OnInit {
   //Step 5. Check player status Receive
   checkPlayersReceiver() {
     this.socketIO.checkPlayersReceived().subscribe((players: any) => {
-      players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
-        if (p.connected) this.playerConnectedOrDisconnected(i)
-        if (p.ready) {
-          this.playerReady(i)
-          if (i !== this.playerReady) this.enemyReady = true
-        }})
+      // players.forEach((p: { connected: any; ready: any; }, i: (number: any) => void) => {
+      //   if (p.connected) this.playerConnectedOrDisconnected(i)
+      //   if (p.ready) {
+      //     this.playerReady(i);
+      //     console.log(i !== this.playerReady, 'i !== this.playerReady');
+      //     //if (i !== this.playerReady) this.enemyReady = true
+      //   }
+      // })
+      console.log(players[this.playerNum], 'player Check');
+      if(players[this.playerNum].connected) this.playerConnectedOrDisconnected(this.playerNum);
+      if(players[this.playerNum].ready)this.playerReady(this.playerNum); 
+        
+      console.log(players[this.otherPlayerNumber], 'otherplayer Check')
+      if(players[this.otherPlayerNumber].connected) this.playerConnectedOrDisconnected(this.otherPlayerNumber);
+      if(players[this.otherPlayerNumber].ready)this.playerReady(this.otherPlayerNumber); 
+      
     })
   }
 
 
   // Step 6 Server API tracking the time limit Receive 
-  timedOut(){
+  timedOut() {
     this.socketIO.timeOut().subscribe(() => {
       this.infoMessageDisplay = "You have reached the 10 minute limit"
     })
   }
- //Step 7
-  fireReceived(){
+  //Step 7
+  fireReceived() {
     //Step 7-A
-    this.socketIO.shotFiredEmitReceived().subscribe((id:any) => {
+    this.socketIO.shotFiredEmitReceived().subscribe((id: any) => {
       this.enemyGo(id)
       const square = this.userSquares[id]
       //Step 7-B
@@ -190,22 +254,38 @@ export class MultiplayerComponent implements OnInit {
     })
   }
   //Step 8
-  fireRelyReceived(){
+  fireRelyReceived() {
     this.socketIO.shotFiredReplyReceived().subscribe((classList: any) => {
       this.revealSquare(classList);
-      this.playGameMulti(); 
+      this.playGameMulti();
     })
   }
 
   playerReady(number: any) {
-    let player = `.p${parseInt(number) + 1}`
+    let playerNumber: number = (number % 2 == 0) ? 0 : 1;
+    let player = `.p${playerNumber + 1}`
     this.playerDisplay.nativeElement.querySelector(`${player} .ready`).classList.toggle('active')
   }
 
-  
 
-  
-  
+  //Testing 
+  getOtherPLayerNumber() {
+    this.socketIO.otherPlayerNumber().subscribe((enemyNumber: any) => {
+      console.log(enemyNumber, 'enemyNumber');
+      this.otherPlayerNumber = enemyNumber;
+    })
+  }
+  //testStep
+  sendPlayerNumberOnConnect() {
+    this.socketIO.emitPlayerNumberOnConnect(this.playerNum);
+  }
+  getOtherPlayerNumberJoinRoomEvent() {
+    this.socketIO.otherPlayerNumberReceived().subscribe((otherPlayerNumber: any) => {
+      this.otherPlayerNumber = otherPlayerNumber;
+      console.log(this.otherPlayerNumber, 'Received Other Player NUmber')
+    })
+  }
+
 
   playGameMulti() {
     if (this.isGameOver) return;
@@ -217,7 +297,7 @@ export class MultiplayerComponent implements OnInit {
     }
     if (this.enemyReady) {
       if (this.currentPlayer === 'user') {
-       //this.infoMessageDisplay = 'Your Go'
+        //this.infoMessageDisplay = 'Your Go'
       }
       if (this.currentPlayer === 'enemy') {
         //this.infoMessageDisplay = "Enemy's Go"
@@ -225,7 +305,7 @@ export class MultiplayerComponent implements OnInit {
     }
   }
 
-  
+
 
   //Making grid for each players
   createBoard(grid: any, squares: any) {
@@ -261,7 +341,7 @@ export class MultiplayerComponent implements OnInit {
     this.currentPlayer = 'enemy'
   }
 
-  enemyGo(square?:any ) {
+  enemyGo(square?: any) {
     if (this.gameMode === 'singlePlayer') square = Math.floor(Math.random() * this.userSquares.length)
     if (!this.userSquares[square].classList.contains('boom')) {
       const hit = this.userSquares[square].classList.contains('taken')
@@ -331,16 +411,25 @@ export class MultiplayerComponent implements OnInit {
 
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
+      this.winingPlayer = (this.playerNum % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
+      this.winingPlayer = (this.otherPlayerNumber % 2 == 0) ? 2 : 1;
+      this.hasWinningPlayer = true; 
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
+    this.multiplayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer, this.currentPlayerNumberConverted); 
+    setTimeout(() => {
+      this.router.navigate(['game-ending'])
+    }, 5000);
+
   }
 
   //drag Events for the ships 
@@ -375,7 +464,6 @@ export class MultiplayerComponent implements OnInit {
     let shipClass = shipNameWithLastID.slice(0, -2);
     let lastShipIndex = parseInt(shipNameWithLastID.substr(-1));
     let shipLastId = lastShipIndex + parseInt(event.target.dataset.id);
-    //console.log(shipLastId, 'shipLastId');
 
     const notAllowedHorizontal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 2, 22, 32, 42, 52, 62, 72, 82, 92, 3, 13, 23, 33, 43, 53, 63, 73, 83, 93]
     const notAllowedVertical = [99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60]
@@ -384,23 +472,34 @@ export class MultiplayerComponent implements OnInit {
     let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
 
     let selectedShipIndex = parseInt(this.selectedShipNameWithIndex.substr(-1))
-    // console.log(shipLastId, 'SecondShipLastID')
-    //console.log(selectedShipIndex, 'selectedShipIndex');
     shipLastId = shipLastId - selectedShipIndex
-    //console.log(shipLastId, 'ThirdShipLastID');
 
-     // vert bug start  trying to get the vert bug just right 
+    // vert bug start  trying to get the vert bug just right 
     //parseInt(event.target.dataset.id) -((lastShipIndex-selectedShipIndex)*10)
-    let startVertIndex = parseInt(event.target.dataset.id) -(selectedShipIndex*10)
-    if((lastShipIndex-selectedShipIndex) === 0){
-      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10); 
+    let startVertIndex = parseInt(event.target.dataset.id) - (selectedShipIndex * 10)
+    if ((lastShipIndex - selectedShipIndex) === 0) {
+      startVertIndex = parseInt(event.target.dataset.id) - (lastShipIndex * 10);
     }
-    if(lastShipIndex === (lastShipIndex-selectedShipIndex)){
+    if (lastShipIndex === (lastShipIndex - selectedShipIndex)) {
       startVertIndex = parseInt(event.target.dataset.id)
     }
     // vert bug end
 
-    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
+    //Start of the ship drop overwrite check.  
+    let checkHertArray: boolean[] = [];
+    let checkVertArray: boolean[] = [];
+    let forLoopStartVertIndex = startVertIndex;
+    //this will be an array of true or false for the check condition 
+    for (let i = 0; i < this.draggedShipLength; i++) {
+      checkHertArray[i] = this.userSquares[parseInt(event.target.dataset.id) - selectedShipIndex + i].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+      checkVertArray[i] = this.userSquares[forLoopStartVertIndex].classList.contains('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined')
+      forLoopStartVertIndex += 10;
+    }
+    // Will check the array for every boolean in the array and return one true or false 
+    let shipDropArrayChecker = (arr: any[]) => arr.some((v: boolean) => v === true);
+    // End of the ship drop overwrite Check 
+
+    if (this.isHorizontal && !newNotAllowedHorizontal.includes(shipLastId) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -409,21 +508,19 @@ export class MultiplayerComponent implements OnInit {
       }
       //As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
       //index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
+    } else if (!this.isHorizontal && !newNotAllowedVertical.includes(startVertIndex) && !shipDropArrayChecker(checkHertArray) && !shipDropArrayChecker(checkVertArray)) {
       for (let i = 0; i < this.draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === this.draggedShipLength - 1) directionClass = 'end'
-        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass)
-        startVertIndex +=10; 
-        // parseInt(event.target.dataset.id) - selectedShipIndex + (this.width * i)
+        this.userSquares[startVertIndex].classList.add('taken', 'vertical', directionClass, shipClass);
+        startVertIndex += 10;
       }
     } else return
 
     this.displayGrid.nativeElement.removeChild(this.draggedShip)
     if (!this.displayGrid.nativeElement.querySelector('.ship')) this.allShipsPlaced = true
   }
-
 
   onDragEnter(event: any) {
     event.preventDefault();
@@ -433,6 +530,6 @@ export class MultiplayerComponent implements OnInit {
   shipIDMouseDown(event: any) {
     this.selectedShipNameWithIndex = event.target.id;
   }
-  
+
 
 }
