@@ -40,7 +40,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
   firedShotsArray: number[] = []
   returnHitMissCheck: boolean = false;
   winingPlayer: string = '';
-  hasWinningPlayer: boolean = false; 
+  hasWinningPlayer: boolean = false;
+  selectedAutoPlaceShips: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -235,20 +236,20 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
       this.winingPlayer = 'Player'
-      this.hasWinningPlayer = true; 
+      this.hasWinningPlayer = true;
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
       this.winingPlayer = 'Computer'
-      this.hasWinningPlayer = true; 
+      this.hasWinningPlayer = true;
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
-    this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer); 
+    this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer);
     setTimeout(() => {
       this.router.navigate(['game-ending'])
     }, 5000);
@@ -287,19 +288,23 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
   }
 
-  autoPlaceShips(){
-    this.clearUserGrid(); 
+  autoPlaceShips() {
+    this.clearUserGrid();
+    this.selectedAutoPlaceShips = true;
     this.generatePlayersShips(this.shipArray[0]);
     this.generatePlayersShips(this.shipArray[1]);
     this.generatePlayersShips(this.shipArray[2]);
     this.generatePlayersShips(this.shipArray[3]);
     this.generatePlayersShips(this.shipArray[4]);
+    this.allShipsPlaced = true; 
   }
 
-  generatePlayersShips(ship:any){
+  generatePlayersShips(ship: any) {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
     let isTaken: boolean = false;
+    let isHorizontalDirection: boolean = false;
+    let isVerticalDirection: boolean = false;
     console.log(current, 'current');
     console.log(randomDirection, 'randomDirection')
     let direction: number = 0;
@@ -308,7 +313,11 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     // if (randomDirection === 1) direction = 10
     if (randomDirection === 0) {
       direction = 1;
-    } else if (randomDirection === 1) { direction = 10; }
+      isHorizontalDirection = true;
+    } else if (randomDirection === 1) {
+      direction = 10;
+      isVerticalDirection = true; 
+    }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.userSquares.length - (ship.directions[0].length * direction)))
 
@@ -320,17 +329,30 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
 
-    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach((index: number) => this.userSquares[randomStart + index].classList.add('taken', ship.name))
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
+      current.forEach((index: number) =>
+        this.userSquares[randomStart + index].classList.add('taken', ship.name))
+    }
+    // if ( isVerticalDirection && !isTaken && !isAtRightEdge && !isAtLeftEdge) {
+    //   current.forEach((index: number) =>
+    //     this.userSquares[randomStart + index].classList.add('taken','vertical', ship.name))
+    // }
+
 
     else this.generatePlayersShips(ship)
   }
 
-  clearUserGrid(){
+  clearUserGrid() {
+   this.selectedAutoPlaceShips = true;
     this.userSquares.forEach((square: any) => {
-      if(square.classList.contains('taken')){
-        square.classList.remove('taken'); 
+      if (square.classList.contains('taken')) {
+        square.classList.remove('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+        square.classList.remove('destroyer', 'submarine', 'cruiser', 'battleship', 'carrier');
       }
     })
+    this.allShipsPlaced = false; 
+    this.selectedAutoPlaceShips = false;
+    
   }
 
   //drag Events for the ships 
