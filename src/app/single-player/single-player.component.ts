@@ -116,6 +116,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     if (this.isGameOver) return
     if (this.currentPlayer === 'user') {
       this.computerSquares.forEach((square: any) => square.addEventListener('click', () => {
+        //if (this.computerSquares[square.dataset.id].classList.contains('miss'))
         this.shotFired = square.dataset.id
         console.log(this.shotFired, 'this.shotFired')
         this.hitMissCheck(this.shotFired);
@@ -128,9 +129,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     }
     if (this.currentPlayer === 'enemy') {
-      setTimeout(() => {
-        this.enemyGoTurn()
-      }, 1000);
+      this.enemyGoTurn()
     }
   }
   hitMissCheck(clickedSquare: number) {
@@ -252,7 +251,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer);
     setTimeout(() => {
       this.router.navigate(['game-ending'])
-    }, 5000);
+    }, 2000);
 
   }
 
@@ -273,6 +272,8 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     } else if (randomDirection === 1) { direction = 10; }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.computerSquares.length - (ship.directions[0].length * direction)))
+    console.log(randomDirection,"randomDirection")
+    console.log(randomStart,"random start")
 
     console.log(randomStart, 'randomStart');
     console.log(current, 'current2')

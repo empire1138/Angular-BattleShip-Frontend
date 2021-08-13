@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: '', component: StartPageComponent },
   { path: 'single-player', component: SinglePlayerComponent },
   { path: 'multiplayer', component: MultiplayerComponent},
-  { path: 'multiplayer-GameLobby', component: MultiplayerGameLobbyComponent},
+  //{ path: 'multiplayer-GameLobby', component: MultiplayerGameLobbyComponent},
   { path: 'multiplayer-GameByCode/:id' , component: MultiplayerGameByCodeComponent}, 
   { path: 'game-ending', component: GameEndingComponent},
   { path: '**', component: PageNotFoundComponent},
