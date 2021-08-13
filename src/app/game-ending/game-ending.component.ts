@@ -47,7 +47,7 @@ export class GameEndingComponent implements OnInit {
 
   startMultiPlayer() {
     // switch to game lobby page then do the websocket calls
-    this.router.navigate(['multiplayer-GameLobby']);
+    this.router.navigate(['multiplayer']);
   }
   startSinglePlayer() {
     // switch to game lobby page then do the websocket calls

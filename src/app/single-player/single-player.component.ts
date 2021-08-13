@@ -128,9 +128,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
 
     }
     if (this.currentPlayer === 'enemy') {
-      setTimeout(() => {
-        this.enemyGoTurn()
-      }, 1000);
+      this.enemyGoTurn()
     }
   }
   hitMissCheck(clickedSquare: number) {
@@ -252,7 +250,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.singlePlayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer); 
     setTimeout(() => {
       this.router.navigate(['game-ending'])
-    }, 5000);
+    }, 2000);
 
   }
 
