@@ -41,6 +41,7 @@ export class MultiplayerComponent implements OnInit {
   currentGameRoomNumber!: number;
   winingPlayer!: number;
   hasWinningPlayer: boolean = false;
+  selectedAutoPlaceShips: boolean = false;
 
   cpuDestroyerCount: number = 0
   cpuSubmarineCount: number = 0
@@ -75,7 +76,7 @@ export class MultiplayerComponent implements OnInit {
     private socketIO: SocketioService,
     private activeRoute: ActivatedRoute,
     private router: Router,
-    private multiplayerService: MultiplayerServiceService 
+    private multiplayerService: MultiplayerServiceService
   ) { }
 
   ngOnInit(): void {
@@ -225,13 +226,13 @@ export class MultiplayerComponent implements OnInit {
       //   }
       // })
       console.log(players[this.playerNum], 'player Check');
-      if(players[this.playerNum].connected) this.playerConnectedOrDisconnected(this.playerNum);
-      if(players[this.playerNum].ready)this.playerReady(this.playerNum); 
-        
+      if (players[this.playerNum].connected) this.playerConnectedOrDisconnected(this.playerNum);
+      if (players[this.playerNum].ready) this.playerReady(this.playerNum);
+
       console.log(players[this.otherPlayerNumber], 'otherplayer Check')
-      if(players[this.otherPlayerNumber].connected) this.playerConnectedOrDisconnected(this.otherPlayerNumber);
-      if(players[this.otherPlayerNumber].ready)this.playerReady(this.otherPlayerNumber); 
-      
+      if (players[this.otherPlayerNumber].connected) this.playerConnectedOrDisconnected(this.otherPlayerNumber);
+      if (players[this.otherPlayerNumber].ready) this.playerReady(this.otherPlayerNumber);
+
     })
   }
 
@@ -412,25 +413,96 @@ export class MultiplayerComponent implements OnInit {
     if ((this.destroyerCount + this.submarineCount + this.cruiserCount + this.battleshipCount + this.carrierCount) === 50) {
       this.infoMessageDisplay = "YOU WIN"
       this.winingPlayer = (this.playerNum % 2 == 0) ? 2 : 1;
-      this.hasWinningPlayer = true; 
+      this.hasWinningPlayer = true;
       this.gameOver()
     }
     if ((this.cpuDestroyerCount + this.cpuSubmarineCount + this.cpuCruiserCount + this.cpuBattleshipCount + this.cpuCarrierCount) === 50) {
       this.infoMessageDisplay = `${enemy.toUpperCase()} WINS`
       this.winingPlayer = (this.otherPlayerNumber % 2 == 0) ? 2 : 1;
-      this.hasWinningPlayer = true; 
+      this.hasWinningPlayer = true;
       this.gameOver()
     }
   }
 
   gameOver() {
     this.isGameOver = true
-    this.multiplayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer, this.currentPlayerNumberConverted); 
+    this.multiplayerService.retrieveWinningInfo(this.winingPlayer, this.hasWinningPlayer, this.currentPlayerNumberConverted);
     setTimeout(() => {
       this.router.navigate(['game-ending'])
     }, 5000);
 
   }
+
+
+  autoPlaceShips() {
+    this.clearUserGrid();
+    this.selectedAutoPlaceShips = true;
+    this.generatePlayersShips(this.shipArray[0]);
+    this.generatePlayersShips(this.shipArray[1]);
+    this.generatePlayersShips(this.shipArray[2]);
+    this.generatePlayersShips(this.shipArray[3]);
+    this.generatePlayersShips(this.shipArray[4]);
+    this.allShipsPlaced = true;
+  }
+
+  generatePlayersShips(ship: any) {
+    let randomDirection = Math.floor(Math.random() * ship.directions.length)
+    let current = ship.directions[randomDirection]
+    let isTaken: boolean = false;
+    let isHorizontalDirection: boolean = false;
+    let isVerticalDirection: boolean = false;
+    console.log(current, 'current');
+    console.log(randomDirection, 'randomDirection')
+    let direction: number = 0;
+
+    if (randomDirection === 0) {
+      direction = 1;
+      isHorizontalDirection = true;
+    } else if (randomDirection === 1) {
+      direction = 10;
+      isVerticalDirection = true;
+    }
+
+    let randomStart = Math.abs(Math.floor(Math.random() * this.userSquares.length - (ship.directions[0].length * direction)))
+
+    console.log(randomStart, 'randomStart');
+    console.log(current, 'current2')
+    isTaken = current.some((index: number) => this.userSquares[randomStart + index].classList.contains('taken'))
+    // 
+    console.log(isTaken, 'isTaken');
+    const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
+    const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
+
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
+      current.forEach((index: number) => {
+        let directionClass
+        let orientationDirection;
+        if (direction === 1) orientationDirection = 'horizontal';
+        if (direction === 10) orientationDirection = 'vertical'
+        if (index === 0) directionClass = 'start'
+        if (index === current.length - 1) directionClass = 'end'
+        if (index === (10 * current.length - 10)) directionClass = 'end'
+        console.log(10 * current.length - 10, 'current.length - 1')
+        console.log(index, 'indexCheck')
+        this.userSquares[randomStart + index].classList.add('taken', orientationDirection, directionClass, ship.name)
+      })
+    }
+    else this.generatePlayersShips(ship)
+  }
+
+  clearUserGrid() {
+    this.selectedAutoPlaceShips = true;
+    this.userSquares.forEach((square: any) => {
+      if (square.classList.contains('taken')) {
+        square.classList.remove('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
+        square.classList.remove('destroyer', 'submarine', 'cruiser', 'battleship', 'carrier');
+      }
+    })
+    this.allShipsPlaced = false;
+    this.selectedAutoPlaceShips = false;
+
+  }
+
 
   //drag Events for the ships 
   onDragStart(event: any) {

@@ -309,8 +309,6 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     console.log(randomDirection, 'randomDirection')
     let direction: number = 0;
 
-    // if (randomDirection === 0) direction = 1
-    // if (randomDirection === 1) direction = 10
     if (randomDirection === 0) {
       direction = 1;
       isHorizontalDirection = true;
@@ -329,36 +327,21 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
 
-    // if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
-    //   current.forEach((index: number) =>
-    //     this.userSquares[randomStart + index].classList.add('taken', ship.name))
-    // }
-    // if ( isVerticalDirection && !isTaken && !isAtRightEdge && !isAtLeftEdge) {
-    //   current.forEach((index: number) =>
-    //     this.userSquares[randomStart + index].classList.add('taken','vertical', ship.name))
-    // }
     if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
       current.forEach((index: number) => {
         let directionClass
-        let orientationDirection; 
+        let orientationDirection;
         if (direction === 1) orientationDirection = 'horizontal';
         if (direction === 10) orientationDirection = 'vertical'
         if (index === 0) directionClass = 'start'
         if (index === current.length - 1) directionClass = 'end'
-        if (index === (10*current.length-10)) directionClass = 'end'
-        console.log(10*current.length-10, 'current.length - 1')
+        if (index === (10 * current.length - 10)) directionClass = 'end'
+        console.log(10 * current.length - 10, 'current.length - 1')
         console.log(index, 'indexCheck')
-        this.userSquares[randomStart + index].classList.add('taken',orientationDirection, directionClass, ship.name)
+        this.userSquares[randomStart + index].classList.add('taken', orientationDirection, directionClass, ship.name)
       })
     }
-    // if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
-    //   for (let i = 0; i < current.length; i++) {
-    //     let directionClass
-    //     if (i === 0) directionClass = 'start'
-    //     if (i === current.length - 1) directionClass = 'end'
-    //     this.userSquares[randomStart + i].classList.add('taken', ship.name, directionClass)
-    //   }
-    // }
+
     else this.generatePlayersShips(ship)
   }
 
