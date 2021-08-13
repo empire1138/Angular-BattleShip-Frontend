@@ -296,7 +296,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     this.generatePlayersShips(this.shipArray[2]);
     this.generatePlayersShips(this.shipArray[3]);
     this.generatePlayersShips(this.shipArray[4]);
-    this.allShipsPlaced = true; 
+    this.allShipsPlaced = true;
   }
 
   generatePlayersShips(ship: any) {
@@ -316,7 +316,7 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
       isHorizontalDirection = true;
     } else if (randomDirection === 1) {
       direction = 10;
-      isVerticalDirection = true; 
+      isVerticalDirection = true;
     }
 
     let randomStart = Math.abs(Math.floor(Math.random() * this.userSquares.length - (ship.directions[0].length * direction)))
@@ -329,30 +329,50 @@ export class SinglePlayerComponent implements OnInit, AfterViewInit {
     const isAtRightEdge = current.some((index: any) => (randomStart + index) % this.width === this.width - 1)
     const isAtLeftEdge = current.some((index: any) => (randomStart + index) % this.width === 0)
 
-    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
-      current.forEach((index: number) =>
-        this.userSquares[randomStart + index].classList.add('taken', ship.name))
-    }
+    // if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
+    //   current.forEach((index: number) =>
+    //     this.userSquares[randomStart + index].classList.add('taken', ship.name))
+    // }
     // if ( isVerticalDirection && !isTaken && !isAtRightEdge && !isAtLeftEdge) {
     //   current.forEach((index: number) =>
     //     this.userSquares[randomStart + index].classList.add('taken','vertical', ship.name))
     // }
-
-
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
+      current.forEach((index: number) => {
+        let directionClass
+        let orientationDirection; 
+        if (direction === 1) orientationDirection = 'horizontal';
+        if (direction === 10) orientationDirection = 'vertical'
+        if (index === 0) directionClass = 'start'
+        if (index === current.length - 1) directionClass = 'end'
+        if (index === (10*current.length-10)) directionClass = 'end'
+        console.log(10*current.length-10, 'current.length - 1')
+        console.log(index, 'indexCheck')
+        this.userSquares[randomStart + index].classList.add('taken',orientationDirection, directionClass, ship.name)
+      })
+    }
+    // if (!isTaken && !isAtRightEdge && !isAtLeftEdge) {
+    //   for (let i = 0; i < current.length; i++) {
+    //     let directionClass
+    //     if (i === 0) directionClass = 'start'
+    //     if (i === current.length - 1) directionClass = 'end'
+    //     this.userSquares[randomStart + i].classList.add('taken', ship.name, directionClass)
+    //   }
+    // }
     else this.generatePlayersShips(ship)
   }
 
   clearUserGrid() {
-   this.selectedAutoPlaceShips = true;
+    this.selectedAutoPlaceShips = true;
     this.userSquares.forEach((square: any) => {
       if (square.classList.contains('taken')) {
         square.classList.remove('taken', 'start', 'end', 'horizontal', 'vertical', 'undefined');
         square.classList.remove('destroyer', 'submarine', 'cruiser', 'battleship', 'carrier');
       }
     })
-    this.allShipsPlaced = false; 
+    this.allShipsPlaced = false;
     this.selectedAutoPlaceShips = false;
-    
+
   }
 
   //drag Events for the ships 
